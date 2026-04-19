@@ -7,8 +7,16 @@ interface VirtualKeyboardProps {
 }
 
 export default function VirtualKeyboard({ expectedKey, pressedKey }: VirtualKeyboardProps) {
-  const isShiftRequired = expectedKey && expectedKey === expectedKey.toUpperCase() && expectedKey.toLowerCase() !== expectedKey;
-  const targetLower = expectedKey?.toLowerCase();
+  const shiftMap: Record<string, string> = {
+    '~': '`', '!': '1', '@': '2', '#': '3', '$': '4', '%': '5', '^': '6', '&': '7', '*': '8', '(': '9', ')': '0',
+    '_': '-', '+': '=', '{': '[', '}': ']', '|': '\\', ':': ';', '"': "'", '<': ',', '>': '.', '?': '/'
+  };
+
+  const isAlphaShift = expectedKey && expectedKey === expectedKey.toUpperCase() && expectedKey.toLowerCase() !== expectedKey;
+  const isSymbolShift = expectedKey && !!shiftMap[expectedKey];
+  const isShiftRequired = isAlphaShift || isSymbolShift;
+  
+  const targetBaseKey = expectedKey ? (shiftMap[expectedKey] || expectedKey.toLowerCase()) : null;
   
   return (
     <div className="flex flex-col gap-[8px] p-[12px] bg-[#e2e8f0] rounded-[12px] select-none font-sans mt-8 mx-auto w-fit">
@@ -18,7 +26,7 @@ export default function VirtualKeyboard({ expectedKey, pressedKey }: VirtualKeyb
             const isSpecial = ['Backspace', 'Tab', 'Caps', 'Shift_L', 'Shift_R', 'Enter', 'Space'].includes(keyId);
             const mapping = BIJOY_MAPPING[keyId];
             
-            const isTarget = (!isSpecial && targetLower === keyId) || (isSpecial && keyId === expectedKey) || (isShiftRequired && (keyId === 'Shift_L' || keyId === 'Shift_R'));
+            const isTarget = (!isSpecial && targetBaseKey === keyId.toLowerCase()) || (isSpecial && keyId === expectedKey) || (isShiftRequired && (keyId === 'Shift_L' || keyId === 'Shift_R'));
             const isPressed = pressedKey?.toLowerCase() === keyId.toLowerCase();
 
             let widthClass = 'w-[48px]';
