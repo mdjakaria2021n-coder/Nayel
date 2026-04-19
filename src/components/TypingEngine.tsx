@@ -25,7 +25,7 @@ export default function TypingEngine({ lesson, onComplete }: TypingEngineProps) 
   const fullKeysString = fullTextObject.map(c => c.expected).join('');
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [typedInputs, setTypedInputs] = useState<('correct' | 'wrong')[]>([]);
+  const [typedInputs, setTypedInputs] = useState<('correct' | 'wrong' | null)[]>([]);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [errors, setErrors] = useState(0);
   const [errorKeys, setErrorKeys] = useState<Record<string, number>>({});
@@ -82,8 +82,13 @@ export default function TypingEngine({ lesson, onComplete }: TypingEngineProps) 
 
     const expectedChar = fullKeysString[currentIndex];
 
+    // Important update: don't push incorrectly to array, rather set exactly at index
     if (typedChar === expectedChar) {
-      setTypedInputs(prev => [...prev, 'correct']);
+      setTypedInputs(prev => {
+        const next = [...prev];
+        next[currentIndex] = 'correct';
+        return next;
+      });
       if (currentIndex + 1 >= fullKeysString.length) {
         setIsFinished(true);
         const finalStats = calculateStats(Date.now());
@@ -93,7 +98,11 @@ export default function TypingEngine({ lesson, onComplete }: TypingEngineProps) 
         setCurrentIndex(prev => prev + 1);
       }
     } else {
-      setTypedInputs(prev => [...prev, 'wrong']);
+      setTypedInputs(prev => {
+        const next = [...prev];
+        next[currentIndex] = 'wrong';
+        return next;
+      });
       setErrors(prev => prev + 1);
       setErrorKeys(prev => ({ ...prev, [expectedChar]: (prev[expectedChar] || 0) + 1 }));
     }
@@ -103,7 +112,7 @@ export default function TypingEngine({ lesson, onComplete }: TypingEngineProps) 
 
   const reset = () => {
     setCurrentIndex(0);
-    setTypedInputs([]);
+    setTypedInputs(new Array(fullKeysString.length).fill(null));
     setStartTime(null);
     setErrors(0);
     setErrorKeys({});
@@ -231,8 +240,8 @@ export default function TypingEngine({ lesson, onComplete }: TypingEngineProps) 
           })}
         </div>
 
-        <div className="w-full h-[60px] bg-[#f8fafc] border-[2px] border-[#e2e8f0] rounded-[12px] flex items-center justify-center text-[24px] text-[#2563eb] font-medium tracking-[2px] shadow-inner mb-[24px] opacity-70">
-           {lesson.words[activeWordIndex]?.keys}
+        <div className="w-full h-[60px] bg-[#f8fafc] border-[2px] border-[#e2e8f0] rounded-[12px] flex items-center justify-center text-[24px] text-[#2563eb] font-medium tracking-[2px] shadow-inner mb-[24px] opacity-70 whitespace-pre">
+           {lesson.words[activeWordIndex]?.keys || 'Space'}
         </div>
       </div>
 

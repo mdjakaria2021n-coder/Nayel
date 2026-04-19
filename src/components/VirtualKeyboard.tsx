@@ -26,8 +26,14 @@ export default function VirtualKeyboard({ expectedKey, pressedKey }: VirtualKeyb
             const isSpecial = ['Backspace', 'Tab', 'Caps', 'Shift_L', 'Shift_R', 'Enter', 'Space'].includes(keyId);
             const mapping = BIJOY_MAPPING[keyId];
             
-            const isTarget = (!isSpecial && targetBaseKey === keyId.toLowerCase()) || (isSpecial && keyId === expectedKey) || (isShiftRequired && (keyId === 'Shift_L' || keyId === 'Shift_R'));
-            const isPressed = pressedKey?.toLowerCase() === keyId.toLowerCase();
+            const isTargetSpace = expectedKey === ' ' && keyId === 'Space';
+            const isTarget = (!isSpecial && targetBaseKey === keyId.toLowerCase()) || 
+                             (isSpecial && keyId === expectedKey) || 
+                             isTargetSpace ||
+                             (isShiftRequired && (keyId === 'Shift_L' || keyId === 'Shift_R'));
+                             
+            const isPressedSpace = pressedKey === ' ' && keyId === 'Space';
+            const isPressed = (pressedKey?.toLowerCase() === keyId.toLowerCase()) || isPressedSpace;
 
             let widthClass = 'w-[48px]';
             if (keyId === 'Backspace') widthClass = 'w-[90px]';
