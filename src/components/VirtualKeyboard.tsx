@@ -20,10 +20,11 @@ export default function VirtualKeyboard({ expectedKey, pressedKey, onKeyClick }:
   const targetBaseKey = expectedKey ? (shiftMap[expectedKey] || expectedKey.toLowerCase()) : null;
   
   return (
-    <div className="flex flex-col gap-[8px] p-[12px] bg-[#e2e8f0] rounded-[12px] select-none font-sans mt-8 mx-auto w-fit">
-      {KEYBOARD_ROWS.map((row, rowIndex) => (
-        <div key={rowIndex} className="flex justify-center gap-[6px]">
-          {row.map((keyId) => {
+    <div className="w-full overflow-x-auto pb-4 hide-scrollbar">
+      <div className="flex flex-col gap-[8px] p-[12px] bg-[#e2e8f0] rounded-[12px] select-none font-sans mt-8 mx-auto w-fit min-w-[800px]">
+        {KEYBOARD_ROWS.map((row, rowIndex) => (
+          <div key={rowIndex} className="flex justify-center gap-[6px]">
+            {row.map((keyId) => {
             const isSpecial = ['Backspace', 'Tab', 'Caps', 'Shift_L', 'Shift_R', 'Enter', 'Space'].includes(keyId);
             const mapping = BIJOY_MAPPING[keyId];
             
@@ -74,6 +75,7 @@ export default function VirtualKeyboard({ expectedKey, pressedKey, onKeyClick }:
           })}
         </div>
       ))}
+      </div>
     </div>
   );
 }

@@ -34,7 +34,10 @@ export default function TypingEngine({ lesson, mode, soundEnabled, onComplete }:
   const [isFinished, setIsFinished] = useState(false);
   const [stats, setStats] = useState({ wpm: 0, accuracy: 100, cpm: 0 });
 
+  const [inputValue, setInputValue] = useState('');
+
   const containerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const EXAM_TIME_LIMIT = 5 * 60; // 5 minutes in seconds
 
   useEffect(() => {
@@ -43,17 +46,27 @@ export default function TypingEngine({ lesson, mode, soundEnabled, onComplete }:
 
   const calculateStats = useCallback((durationSec: number) => {
     const timeMins = Math.max(durationSec / 60, 0.01); // avoid Infinity
-    const typedChars = currentIndex;
-    const grossWpm = (typedChars / 5) / timeMins;
-    const netWpm = Math.max(0, grossWpm - (errors / timeMins));
-    const accuracyLog = typedChars === 0 ? 100 : ((typedChars - errors) / typedChars) * 100;
+    
+    // Count exact correct words completed
+    let correctWords = 0;
+    let countedChars = 0;
+    for (let i = 0; i < lesson.words.length; i++) {
+        const wordLen = lesson.words[i].keys.length;
+        if (currentIndex >= countedChars + wordLen) {
+            correctWords++;
+        }
+        countedChars += wordLen + 1; // plus space
+    }
+
+    const netWpm = Math.max(0, correctWords / timeMins);
+    const accuracyLog = currentIndex === 0 ? 100 : ((currentIndex - errors) / currentIndex) * 100;
     
     return {
       wpm: Math.round(netWpm),
       accuracy: Number(Math.max(0, accuracyLog).toFixed(1)),
-      cpm: Math.round(typedChars / timeMins)
+      cpm: Math.round(currentIndex / timeMins)
     };
-  }, [currentIndex, errors]);
+  }, [currentIndex, errors, lesson]);
 
   useEffect(() => {
     if (startTime && !isFinished) {
@@ -81,10 +94,16 @@ export default function TypingEngine({ lesson, mode, soundEnabled, onComplete }:
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (isFinished) return;
     if (e.metaKey || e.ctrlKey || e.altKey) return;
-    if (e.key === 'Shift' || e.key === 'Caps Lock') {
-      setPressedKey(`Shift_${e.location === 1 ? 'L' : 'R'}`);
+    
+    // Ignore meta/actions entirely so they don't increment errors
+    if (['Shift', 'CapsLock', 'Control', 'Alt', 'Meta', 'Tab', 'Enter', 'Escape', 'Backspace'].includes(e.key)) {
+      if (e.key === 'Shift') {
+        setPressedKey(`Shift_${e.location === 1 ? 'L' : 'R'}`);
+        setTimeout(() => setPressedKey(null), 100);
+      }
       return;
     }
+    
     e.preventDefault();
 
     // Map physical keys natively for Bijoy handling isolation
@@ -142,7 +161,18 @@ export default function TypingEngine({ lesson, mode, soundEnabled, onComplete }:
     }
     
     setTimeout(() => setPressedKey(null), 100);
-    containerRef.current?.focus();
+  };
+
+  const getQwertyChar = (char: string) => {
+    // Reverse simple mapping if they output proper bangla keys
+    const nativeMap: Record<string, string> = {
+      'অ': 'F', 'আ': 'f', 'ি': 'd', 'ী': 'D', 'ু': 's', 'ূ': 'S', 'ৃ': 'a', 'ে': 'c', 'ৈ': 'C', 'ো': 'x', 'ৌ': 'X',
+      'ক': 'j', 'খ': 'J', 'গ': 'o', 'ঘ': 'O', 'ঙ': 'q', 'চ': 'y', 'ছ': 'Y', 'জ': 'u', 'ঝ': 'U', 'ঞ': 'I',
+      'ট': 't', 'ঠ': 'T', 'ড': 'e', 'ঢ': 'E', 'ণ': 'w', 'ত': 'k', 'থ': 'K', 'দ': 'l', 'ধ': 'L', 'ন': 'b',
+      'প': 'r', 'ফ': 'R', 'ব': 'h', 'ভ': 'H', 'ম': 'm', 'য': 'W', 'র': 'v', 'ল': 'V', 'শ': 'M', 'ষ': 'N', 'স': 'n', 'হ': 'i',
+      'ড়': 'p', 'ঢ়': 'P', 'য়': 'z', 'ৎ': 'Z', 'ং': 'B', 'ঃ': ':', 'ঁ': '^', '্': 'g', '।': 'G'
+    };
+    return nativeMap[char] || char;
   };
 
   const reset = () => {
@@ -154,7 +184,8 @@ export default function TypingEngine({ lesson, mode, soundEnabled, onComplete }:
     setErrorKeys({});
     setIsFinished(false);
     setStats({ wpm: 0, accuracy: 100, cpm: 0 });
-    containerRef.current?.focus();
+    setInputValue('');
+    inputRef.current?.focus();
   };
 
   let accumulatedKeys = 0;
@@ -176,9 +207,7 @@ export default function TypingEngine({ lesson, mode, soundEnabled, onComplete }:
   return (
     <div 
       className="flex flex-col gap-6 w-full max-w-5xl mx-auto focus:outline-none" 
-      onKeyDown={handleKeyDown} 
-      tabIndex={0}
-      ref={containerRef}
+      onClick={() => inputRef.current?.focus()}
     >
       {/* Header Info */}
       <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
@@ -258,7 +287,7 @@ export default function TypingEngine({ lesson, mode, soundEnabled, onComplete }:
           </div>
         )}
 
-        <div className="flex flex-wrap gap-x-8 gap-y-8 justify-center max-w-4xl mx-auto mb-8 font-serif">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12 justify-items-center w-full max-w-5xl mx-auto mb-10 font-serif">
           {lesson.words.map((word, wIdx) => {
             const isActive = wIdx === activeWordIndex;
             return (
@@ -278,7 +307,7 @@ export default function TypingEngine({ lesson, mode, soundEnabled, onComplete }:
                         key={cIdx} 
                         className={cn(
                           "relative px-1 transition-all rounded",
-                          status === 'correct' ? "text-emerald-500 bg-emerald-50 dark:bg-emerald-900/20" : 
+                          status === 'correct' ? "text-green-600 bg-green-100 dark:bg-green-900/30" : 
                           status === 'wrong' ? "bg-red-500 text-white" : "text-slate-400 dark:text-slate-500",
                           isCurrent && "border-b-[3px] border-blue-500 text-blue-600 dark:text-blue-400 pb-0.5"
                         )}
@@ -288,10 +317,40 @@ export default function TypingEngine({ lesson, mode, soundEnabled, onComplete }:
                     );
                   })}
                 </div>
+                {word.hint && (
+                  <div className="mt-3 text-sm font-sans font-bold text-blue-500 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded">
+                    {word.hint}
+                  </div>
+                )}
               </div>
             );
           })}
         </div>
+
+        {/* Input area for typing */ !isFinished && (
+          <div className="mt-8 max-w-lg mx-auto w-full">
+            <label className="block text-center text-slate-500 dark:text-slate-400 text-sm font-bold uppercase tracking-wider mb-2 font-sans">
+              আপনার টাইপিং এখানে প্র্যাকটিস করুন:
+            </label>
+            <input 
+              ref={inputRef}
+              type="text" 
+              autoFocus
+              value={inputValue}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val.length > inputValue.length) {
+                  const addedChar = val.slice(-1);
+                  handleKeyInput(getQwertyChar(addedChar));
+                }
+                setInputValue(val);
+              }}
+              onKeyDown={handleKeyDown}
+              className="w-full p-4 border-2 border-blue-400 dark:border-blue-600 bg-blue-50/50 dark:bg-slate-900 rounded-xl outline-none focus:ring-4 focus:ring-blue-500/30 text-center text-3xl font-serif text-slate-800 dark:text-slate-100 placeholder:text-blue-300 dark:placeholder:text-slate-600 shadow-inner"
+              placeholder="এখানে টাইপ করুন..."
+            />
+          </div>
+        )}
       </div>
 
       <VirtualKeyboard 

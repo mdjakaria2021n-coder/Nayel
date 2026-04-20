@@ -67,7 +67,7 @@ export default function Dashboard() {
   }));
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors font-serif pb-20">
+    <div className="min-h-screen w-screen overflow-x-hidden bg-slate-50 dark:bg-slate-900 transition-colors font-serif pb-20">
       
       {/* Navbar */}
       <nav className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-50">
