@@ -4,9 +4,10 @@ import { BIJOY_MAPPING, KEYBOARD_ROWS } from '../lib/bijoy-mapping';
 interface VirtualKeyboardProps {
   expectedKey: string | null;
   pressedKey: string | null;
+  onKeyClick?: (keyId: string) => void;
 }
 
-export default function VirtualKeyboard({ expectedKey, pressedKey }: VirtualKeyboardProps) {
+export default function VirtualKeyboard({ expectedKey, pressedKey, onKeyClick }: VirtualKeyboardProps) {
   const shiftMap: Record<string, string> = {
     '~': '`', '!': '1', '@': '2', '#': '3', '$': '4', '%': '5', '^': '6', '&': '7', '*': '8', '(': '9', ')': '0',
     '_': '-', '+': '=', '{': '[', '}': ']', '|': '\\', ':': ';', '"': "'", '<': ',', '>': '.', '?': '/'
@@ -47,8 +48,10 @@ export default function VirtualKeyboard({ expectedKey, pressedKey }: VirtualKeyb
             return (
               <div
                 key={keyId}
+                onClick={onKeyClick ? () => onKeyClick(keyId) : undefined}
                 className={cn(
                   'relative h-[48px] flex flex-col justify-center items-center rounded-[6px] transition-all duration-100',
+                  onKeyClick && 'cursor-pointer active:translate-y-[2px]',
                   widthClass,
                   'bg-[#ffffff] text-[#64748b] shadow-[0_2px_0_#cbd5e1]',
                   isTarget && !isPressed && 'ring-[4px] ring-[#2563eb]/30 border border-[#2563eb]',

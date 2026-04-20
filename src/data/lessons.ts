@@ -1,7 +1,7 @@
 export interface Lesson {
-  id: number;
+  id: string | number;
   title: string;
-  level: 'Beginner' | 'Intermediate' | 'Advanced' | 'Exam';
+  level: string;
   description: string;
   words: { keys: string; bangla: string }[];
 }
@@ -9,199 +9,82 @@ export interface Lesson {
 export const LESSONS: Lesson[] = [
   {
     id: 1,
-    title: 'লিসন ১: হোম রো (সাধারণ অক্ষর)',
+    title: 'লেভেল ১: স্বরবর্ণ',
     level: 'Beginner',
-    description: 'মাঝের সারির (ক, ত, দ, ব, ম) এবং (া, ি, ু) বারবার টাইপ করে আঙুল সেট করুন।',
+    description: 'অ আ ই ঈ উ ঊ ঋ এ ঐ ও ঔ - স্বরবর্ণ শিখুন। (বিজয়ী কীবোর্ডের নিয়ম অনুযায়ী)',
     words: [
-      { keys: 'jjj', bangla: 'ককক' }, { keys: 'kkk', bangla: 'ততত' }, { keys: 'lll', bangla: 'দদদ' },
-      { keys: 'hhh', bangla: 'ববব' }, { keys: 'mmm', bangla: 'মমম' }, { keys: 'fff', bangla: 'াাা' },
-      { keys: 'ddd', bangla: 'িিি' }, { keys: 'sss', bangla: 'ুুু' },
-      { keys: 'jfj', bangla: 'কাক' }, { keys: 'kfk', bangla: 'তাত' }, { keys: 'ldl', bangla: 'দাদ' },
-      { keys: 'hfh', bangla: 'বাব' }, { keys: 'mfm', bangla: 'মাম' }, { keys: 'jdj', bangla: 'কিক' },
-      { keys: 'kdk', bangla: 'তিত' }, { keys: 'jsj', bangla: 'কুক' }, { keys: 'ksk', bangla: 'তুত' },
-      { keys: 'jjk', bangla: 'ককত' }, { keys: 'kkl', bangla: 'ততদ' }, { keys: 'hhm', bangla: 'ববম' },
-      { keys: 'jjjj', bangla: 'কককক' }, { keys: 'kkkk', bangla: 'তততত' }, { keys: 'llll', bangla: 'দদদদ' },
-      { keys: 'hhhh', bangla: 'বববব' }, { keys: 'mmmm', bangla: 'মমমম' }
+      { keys: 'F', bangla: 'অ' }, { keys: 'Ff', bangla: 'আ' }, { keys: 'gd', bangla: 'ই' },
+      { keys: 'gD', bangla: 'ঈ' }, { keys: 'gs', bangla: 'উ' }, { keys: 'gS', bangla: 'ঊ' },
+      { keys: 'ga', bangla: 'ঋ' }, { keys: 'gc', bangla: 'এ' }, { keys: 'gC', bangla: 'ঐ' },
+      { keys: 'gx', bangla: 'ও' }, { keys: 'gX', bangla: 'ঔ' },
+      { keys: 'F Ff gd', bangla: 'অ আ ই' }, { keys: 'gs gS ga', bangla: 'উ ঊ ঋ' }
     ]
   },
   {
     id: 2,
-    title: 'লিসন ২: হোম রো (Shift - খ, থ, ধ, ভ, শ)',
+    title: 'লেভেল ২: ব্যঞ্জনবর্ণ',
     level: 'Beginner',
-    description: 'Shift চেপে ধরে খ, থ, ধ, ভ, শ এবং ী, ূ বারবার প্র্যাকটিস করুন যেন মুখস্থ হয়ে যায়।',
+    description: 'ক থেকে হ পর্যন্ত সাধারণ ব্যঞ্জনবর্ণের অনুশীলন।',
     words: [
-      { keys: 'JJJ', bangla: 'খখখ' }, { keys: 'KKK', bangla: 'থথথ' }, { keys: 'LLL', bangla: 'ধধধ' },
-      { keys: 'HHH', bangla: 'ভভভ' }, { keys: 'MMM', bangla: 'শশশ' }, { keys: 'FFF', bangla: 'অঅঅ' },
-      { keys: 'DDD', bangla: 'ীীী' }, { keys: 'SSS', bangla: 'ূূূ' },
-      { keys: 'JFJ', bangla: 'খঅখ' }, { keys: 'KFK', bangla: 'থঅথ' }, { keys: 'LFL', bangla: 'ধঅধ' },
-      { keys: 'HFH', bangla: 'ভঅভ' }, { keys: 'MFM', bangla: 'শঅশ' }, { keys: 'JDJ', bangla: 'খীখ' },
-      { keys: 'KDK', bangla: 'থীথ' }, { keys: 'LDL', bangla: 'ধীধ' }, { keys: 'JjJ', bangla: 'খকখ' },
-      { keys: 'KkK', bangla: 'থতথ' }, { keys: 'LlL', bangla: 'ধদধ' }, { keys: 'HhH', bangla: 'ভবভ' },
-      { keys: 'J J K K L L', bangla: 'খ খ থ থ ধ ধ' }, { keys: 'H H M M F F', bangla: 'ভ ভ শ শ অ অ' }
+      { keys: 'j', bangla: 'ক' }, { keys: 'J', bangla: 'খ' }, { keys: 'o', bangla: 'গ' }, 
+      { keys: 'O', bangla: 'ঘ' }, { keys: 'q', bangla: 'ঙ' },
+      { keys: 'y', bangla: 'চ' }, { keys: 'Y', bangla: 'ছ' }, { keys: 'u', bangla: 'জ' },
+      { keys: 'U', bangla: 'ঝ' }, { keys: 'I', bangla: 'ঞ' },
+      { keys: 'k', bangla: 'ত' }, { keys: 'K', bangla: 'থ' }, { keys: 'l', bangla: 'দ' },
+      { keys: 'L', bangla: 'ধ' }, { keys: 'b', bangla: 'ন' },
+      { keys: 'r', bangla: 'প' }, { keys: 'R', bangla: 'ফ' }, { keys: 'h', bangla: 'ব' },
+      { keys: 'H', bangla: 'ভ' }, { keys: 'm', bangla: 'ম' },
+      { keys: 'j o y u', bangla: 'ক গ চ জ' }, { keys: 'k l r h', bangla: 'ত দ প ব' }
     ]
   },
   {
     id: 3,
-    title: 'লিসন ৩: টপ রো (সাধারণ অক্ষর)',
+    title: 'লেভেল ৩: মাত্রা ও কার',
     level: 'Intermediate',
-    description: 'চ, জ, প, ট, ড, গ বারবার মুখস্থ করার জন্য এই লিসন।',
+    description: 'আ-কার (া), ই-কার (ি), উ-কার (ু) ইত্যাদি যুক্ত করে শব্দ তৈরি।',
     words: [
-      { keys: 'yyy', bangla: 'চচচ' }, { keys: 'uuu', bangla: 'জজজ' }, { keys: 'rrr', bangla: 'পপপ' },
-      { keys: 'ttt', bangla: 'টটট' }, { keys: 'eee', bangla: 'ডডড' }, { keys: 'ooo', bangla: 'গগগ' },
-      { keys: 'iii', bangla: 'হহহ' },
-      { keys: 'yfy', bangla: 'চাচ' }, { keys: 'ufu', bangla: 'জাজ' }, { keys: 'rfr', bangla: 'পাপ' },
-      { keys: 'tft', bangla: 'টাট' }, { keys: 'efe', bangla: 'ডাড' }, { keys: 'ofo', bangla: 'গাগ' },
-      { keys: 'yuy', bangla: 'চজচ' }, { keys: 'rtr', bangla: 'পটপ' }, { keys: 'eoe', bangla: 'ডগড' },
-      { keys: 'yyyy uuuu', bangla: 'চচচচ জজজজ' }, { keys: 'rrrr tttt', bangla: 'পপপপ টটটট' }
+      { keys: 'f', bangla: 'া' }, { keys: 'd', bangla: 'ি' }, { keys: 'D', bangla: 'ী' },
+      { keys: 's', bangla: 'ু' }, { keys: 'S', bangla: 'ূ' }, { keys: 'a', bangla: 'ৃ' },
+      { keys: 'c', bangla: 'ে' }, { keys: 'C', bangla: 'ৈ' }, { keys: 'cvf', bangla: 'রো' },
+      { keys: 'jfj', bangla: 'কাক' }, { keys: 'kdk', bangla: 'তিত' }, { keys: 'jsj', bangla: 'কুক' },
+      { keys: 'cjc', bangla: 'েকে' }
     ]
   },
   {
     id: 4,
-    title: 'লিসন ৪: টপ রো (Shift - ছ, ঝ, ফ, ঠ, ঢ, ঘ)',
+    title: 'লেভেল ৪: সাধারণ শব্দ',
     level: 'Intermediate',
-    description: 'Shift চেপে ছ, ঝ, ফ, ঠ, ঢ, ঘ বেশি করে টাইপ করুন।',
+    description: 'বহুল ব্যবহৃত সাধারণ বাংলা শব্দসমূহ দ্রুত টাইপ করার প্র্যাকটিস।',
     words: [
-      { keys: 'YYY', bangla: 'ছছছ' }, { keys: 'UUU', bangla: 'ঝঝঝ' }, { keys: 'RRR', bangla: 'ফফফ' },
-      { keys: 'TTT', bangla: 'ঠঠঠ' }, { keys: 'EEE', bangla: 'ঢঢঢ' }, { keys: 'OOO', bangla: 'ঘঘঘ' },
-      { keys: 'III', bangla: 'ঞঞঞ' },
-      { keys: 'YFY', bangla: 'ছঅছ' }, { keys: 'UFU', bangla: 'ঝঅঝ' }, { keys: 'RFR', bangla: 'ফঅফ' },
-      { keys: 'TFT', bangla: 'ঠঅঠ' }, { keys: 'EFE', bangla: 'ঢঅঢ' }, { keys: 'OFO', bangla: 'ঘঅঘ' },
-      { keys: 'YyY', bangla: 'ছচছ' }, { keys: 'UuU', bangla: 'ঝজঝ' }, { keys: 'RrR', bangla: 'ফপফ' },
-      { keys: 'TtT', bangla: 'ঠটঠ' }, { keys: 'EeE', bangla: 'ঢডঢ' }, { keys: 'OoO', bangla: 'ঘগঘ' }
+      { keys: 'Ffmgv', bangla: 'আমার' }, { keys: 'bvf', bangla: 'নাম' }, { keys: 'hfvM', bangla: 'বাংলা' },
+      { keys: 'kfv', bangla: 'তার' }, { keys: 'c`M', bangla: 'দেশ' }, { keys: 'hfv', bangla: 'বার' },
+      { keys: 'Kfv', bangla: 'থার' }, { keys: 'vj', bangla: 'রদ' }, { keys: 'Kfc', bangla: 'থাকে' },
+      { keys: 'yfv', bangla: 'চার' }, { keys: 'ofv', bangla: 'গার' }, { keys: 'dfv', bangla: 'দির' },
+      { keys: 'cvj', bangla: 'রোদ' }
     ]
   },
   {
     id: 5,
-    title: 'লিসন ৫: বটম রো (সাধারণ অক্ষর)',
-    level: 'Intermediate',
-    description: 'র, ন, স, ল, এ, ও টাইপ করে আঙুল বসান ও সময় নিয়ে শিখুন। (ল হচ্ছে V, ম হচ্ছে M, স হচ্ছে N)',
+    title: 'লেভেল ৫: যুক্তাক্ষর',
+    level: 'Advanced',
+    description: 'কঠিন ও সাধারণ যুক্তাক্ষরগুলোর (g ব্যবহার করে) অনুশীলন।',
     words: [
-      { keys: 'vvv', bangla: 'ররর' }, { keys: 'bbb', bangla: 'ননন' }, { keys: 'nnn', bangla: 'সসস' },
-      { keys: 'mmm', bangla: 'মমম' }, { keys: 'ccc', bangla: 'এএএ' }, { keys: 'xxx', bangla: 'ওওও' },
-      { keys: 'VVV', bangla: 'ললল' }, 
-      { keys: 'vfv', bangla: 'রার' }, { keys: 'bfb', bangla: 'নান' }, { keys: 'nfn', bangla: 'সাস' },
-      { keys: 'mfm', bangla: 'মাম' }, { keys: 'VVfVV', bangla: 'লাল' }, { keys: 'cvc', bangla: 'এরএ' },
-      { keys: 'xbx', bangla: 'ওনও' }, { keys: 'vbvb', bangla: 'রনরন' }, { keys: 'nmnm', bangla: 'সস' },
-      { keys: 'vvbbnnmm', bangla: 'ররন্ননসসমম' }
+      { keys: 'jgN', bangla: 'ক্ষ' }, { keys: 'ugI', bangla: 'জ্ঞ' }, { keys: 'jgj', bangla: 'ক্ক' },
+      { keys: 'lgb', bangla: 'দ্ন' }, { keys: 'lgh', bangla: 'দ্ব' }, { keys: 'mgh', bangla: 'ম্ব' },
+      { keys: 'qgo', bangla: 'ঙ্গ' }, { keys: 'Igu', bangla: 'ঞ্জ' }, { keys: 'Njk', bangla: 'ষত' },
+      { keys: 'ngK', bangla: 'স্থ' }, { keys: 'lghf', bangla: 'দ্ধা' }, { keys: 'Mgm', bangla: 'শ্ম' }
     ]
   },
   {
     id: 6,
-    title: 'লিসন ৬: বটম রো (Shift - ণ, ষ, ঐ, ৗ, ং)',
-    level: 'Advanced',
-    description: 'Shift চেপে ণ, ষ, ঐ, ৗ, ং ইত্যাদি প্র্যাকটিস। (ং হচ্ছে ; এর জায়গায়)',
-    words: [
-      { keys: 'BBB', bangla: 'ণণণ' }, { keys: 'NNN', bangla: 'ষষষ' }, { keys: 'CCC', bangla: 'ঐঐঐ' },
-      { keys: 'XXX', bangla: 'ৗৗৗ' }, { keys: ';;;', bangla: 'ংংং' },
-      { keys: 'BFB', bangla: 'ণঅণ' }, { keys: 'NFN', bangla: 'ষঅষ' },
-      { keys: 'BbB', bangla: 'ণনণ' }, { keys: 'NnN', bangla: 'ষসষ' }, { keys: 'CcC', bangla: 'ঐএঐ' },
-      { keys: 'BBNN', bangla: 'ণণষষ' }, { keys: 'CCXX', bangla: 'ঐঐৗৗ' }
-    ]
-  },
-  {
-    id: 7,
-    title: 'লিসন ৭: শিফট মিক্সড প্র্যাকটিস',
-    level: 'Advanced',
-    description: 'খ, থ, ঘ, ছ এবং অন্যান্য শিফট লেটার মিলে গঠিত প্র্যাকটিস।',
-    words: [
-      { keys: 'JFY', bangla: 'খঅছ' }, { keys: 'KFU', bangla: 'থঅঝ' }, { keys: 'LFR', bangla: 'ধঅফ' },
-      { keys: 'HFT', bangla: 'ভঅঠ' }, { keys: 'MFE', bangla: 'শঅঢ' }, { keys: 'DDO', bangla: 'ীীঘ' },
-      { keys: 'SSB', bangla: 'ূূণ' }, { keys: 'AAN', bangla: 'র্র্ষ' }, { keys: 'KF;', bangla: 'থঅং' },
-      { keys: 'Jj Yy Rr', bangla: 'খক ছচ ফপ' }, { keys: 'Ll Ee Nn', bangla: 'ধদ ঢড ষস' },
-      { keys: 'Kk Tt Bb', bangla: 'থত ঠট ণন' }
-    ]
-  },
-  {
-    id: 8,
-    title: 'লিসন ৮: সাধারণ শব্দ গঠন (ছোট)',
-    level: 'Advanced',
-    description: 'যে অক্ষরগুলো শিখেছেন তা দিয়ে ছোট ছোট বাংলা শব্দ।',
-    words: [
-      { keys: 'jfj', bangla: 'কাক' }, { keys: 'kfk', bangla: 'তাত' }, { keys: 'jfd', bangla: 'কাকি' },
-      { keys: 'kfv', bangla: 'তার' }, { keys: 'hfd', bangla: 'বাবি' }, { keys: 'vdv', bangla: 'রির' },
-      { keys: 'jvd', bangla: 'করি' }, { keys: 'bvf', bangla: 'নরা' }, { keys: 'hv;', bangla: 'বরং' },
-      { keys: 'cl', bangla: 'এদ' }, { keys: 'cv', bangla: 'এর' }, { keys: 'vf', bangla: 'রা' },
-      { keys: 'yfd', bangla: 'চাহি' }, { keys: 'nkv', bangla: 'সতর' }, { keys: 'Vjv', bangla: 'লকর' }
-    ]
-  },
-  {
-    id: 9,
-    title: 'লিসন ৯: শিফট-সহ বড় শব্দ গঠন',
+    title: 'লেভেল ৬: পূর্ণ বাক্য (সাহিত্যিক)',
     level: 'Exam',
-    description: 'বড় ও শিফটযুক্ত শব্দের টানা প্র্যাকটিস যা আপনার স্পিড বাড়াবে।',
+    description: 'পুরো ব্যাকরণ এবং শব্দ মিলিয়ে লম্বা বাক্য টাইপ করার চূড়ান্ত পরীক্ষা।',
     words: [
-      { keys: 'Jfvf', bangla: 'খারা' }, { keys: 'Ofn', bangla: 'ঘাস' }, { keys: 'Yfp', bangla: 'ছাড়' },
-      { keys: 'Uvp', bangla: 'ঝরড়' }, { keys: 'Kfv', bangla: 'থার' }, { keys: 'Rjf', bangla: 'ফকা' },
-      { keys: 'Tfc', bangla: 'ঠাএ' }, { keys: 'Mvf', bangla: 'শরা' }, { keys: 'YfM', bangla: 'ছাশ' },
-      { keys: 'Ovf', bangla: 'ঘরা' }
-    ]
-  },
-  {
-    id: 10,
-    title: 'লিসন ১০: যুক্তাক্ষর শুরু (Juktakkhor Basics)',
-    level: 'Exam',
-    description: 'g (Linker - ্) ব্যবহার করে যুক্তাক্ষর তৈরি করা (যেমন ক+্+ক = ক্ক)।',
-    words: [
-      { keys: 'jgj', bangla: 'ক্ক' }, { keys: 'jgy', bangla: 'ক্চ' }, { keys: 'lgb', bangla: 'দ্ন' },
-      { keys: 'lgh', bangla: 'দ্ব' }, { keys: 'sgl', bangla: 'ু্দ' }, { keys: 'vFjgj', bangla: 'রঅক্ক' },
-      { keys: 'ngd', bangla: 'স্ি' }, { keys: 'vgl', bangla: 'র্ল' }, { keys: 'jgn', bangla: 'ক্স' }
-    ]
-  },
-  {
-    id: 11,
-    title: 'লিসন ১১: যুক্তাক্ষর - ম-ফলা ও ব-ফলা',
-    level: 'Exam',
-    description: 'ব-ফলা (g + h) এবং ম-ফলা (g + m) এর ব্যবহার শিখুন।',
-    words: [
-      { keys: 'jgm', bangla: 'ক্ম' }, { keys: 'lgm', bangla: 'দ্ম' }, { keys: 'nfm', bangla: 'সাম' },
-      { keys: 'lgh', bangla: 'দ্ব' }, { keys: 'kgh', bangla: 'ত্ব' }, { keys: 'ngh', bangla: 'স্ব' },
-      { keys: 'ngmjgj', bangla: 'স্মক্ক' }, { keys: 'lghf', bangla: 'দ্ধা' }, { keys: 'Mgh', bangla: 'শ্ব' }
-    ]
-  },
-  {
-    id: 12,
-    title: 'লিসন ১২: যুক্তাক্ষর - য-ফলা ও র-ফলা',
-    level: 'Exam',
-    description: 'য-ফলা (Z) এবং র-ফলা (z) এর সঠিক ব্যবহার শিখুন।',
-    words: [
-      { keys: 'Z', bangla: '্য' }, { keys: 'z', bangla: '্র' }, 
-      { keys: 'jZ', bangla: 'ক্য' }, { keys: 'jz', bangla: 'ক্র' }, { keys: 'bZ', bangla: 'ন্য' },
-      { keys: 'Vz', bangla: 'ল্র' }, { keys: 'MZ', bangla: 'শ্য' }, { keys: 'hZ', bangla: 'ব্য' },
-      { keys: 'gZ', bangla: '্্য' }, { keys: 'vFZ', bangla: 'রঅ্য' }
-    ]
-  },
-  {
-    id: 13,
-    title: 'লিসন ১৩: যুক্তাক্ষর - ক্ষ, জ্ঞ, ঞ্জ, ঙ্গ',
-    level: 'Exam',
-    description: 'সবচেয়ে বেশি ব্যবহৃত কঠিন যুক্তাক্ষরগুলোর চর্চা করুন।',
-    words: [
-      { keys: 'jgN', bangla: 'ক্ষ' }, { keys: 'ugI', bangla: 'জ্ঞ' }, { keys: 'Igu', bangla: 'ঞ্জ' },
-      { keys: 'qgo', bangla: 'ঙ্গ' }, { keys: 'bgT', bangla: 'ন্ট' }, { keys: 'Bge', bangla: 'ণ্ড' },
-      { keys: 'jgNf', bangla: 'ক্ষা' }, { keys: 'ugIf', bangla: 'জ্ঞা' }, { keys: 'qgov', bangla: 'ঙ্গর' }
-    ]
-  },
-  {
-    id: 14,
-    title: 'লিসন ১৪: পূর্ণাঙ্গ প্র্যাকটিস ১',
-    level: 'Exam',
-    description: 'এতক্ষণ যা যা শিখেছেন তার সব কিছুর সংমিশ্রণ। এটি আপনার টাইপিং দক্ষতাকে পরীক্ষার পর্যায় নিয়ে যাবে।',
-    words: [
-      { keys: 'jgjgj', bangla: 'ক্ক্ক' }, { keys: 'jfvfv', bangla: 'কারার' }, { keys: 'jgNfvg', bangla: 'ক্ষার্' },
-      { keys: 'ugIM', bangla: 'জ্ঞশ' }, { keys: 'VfVf', bangla: 'লালা' }, { keys: 'MgjN', bangla: 'শ্ক্ষ' },
-      { keys: 'MgbV', bangla: 'শ্নল' }, { keys: 'jfnfv', bangla: 'কাসার' }, { keys: 'ngkI', bangla: 'স্তঞ' }
-    ]
-  },
-  {
-    id: 15,
-    title: 'লিসন ১৫: পূর্ণাঙ্গ প্র্যাকটিস ২ (মাস্টার টেস্ট)',
-    level: 'Exam',
-    description: 'এই লিসনটি সম্পূর্ণ করতে পারলে আপনি বিজয়ী ক্লাসিকে মাস্টার! সমস্ত যুক্তাক্ষর ও সাধারণ অক্ষরের খেলা।',
-    words: [
-      { keys: 'vFjgNf', bangla: 'রঅক্ষা' }, { keys: 'MghfM', bangla: 'শ্বাশ' }, { keys: 'lghfbg', bangla: 'দ্ধান্' },
-      { keys: 'lghz', bangla: 'দ্ব্র' }, { keys: 'mghZ', bangla: 'ম্ব্য' }, { keys: 'jghfI', bangla: 'ক্বাঞ' },
-      { keys: 'IguI', bangla: 'ঞ্জঞ' }, { keys: 'qgovf', bangla: 'ঙ্গরা' }, { keys: 'lghzZ', bangla: 'দ্ব্র্য' }
+      { keys: 'Ffmgv', bangla: 'আমার' }, { keys: 'nxfbvfV', bangla: 'সোনার' }, { keys: 'hfvMvf', bangla: 'বাংলা' },
+      { keys: 'Ffmg', bangla: 'আমি' }, { keys: 'nkfgvfC', bangla: 'তোমায়' }, { keys: 'Hfvnvhfnc', bangla: 'ভালোবাসি' },
+      { keys: 'jgNfv', bangla: 'ক্ষীর' }, { keys: 'bglx', bangla: 'নদী' }, { keys: 'ugIfb', bangla: 'জ্ঞান' },
+      { keys: 'Ffb', bangla: 'আন' }
     ]
   }
 ];
-

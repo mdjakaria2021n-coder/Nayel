@@ -1,5 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Tiro+Bangla:ital@0;1&family=Noto+Serif+Bengali:wght@400;700&family=Inter:wght@400;500;700&display=swap');
+
 @import "tailwindcss";
 
 @theme {
-  --font-sans: 'Helvetica Neue', Arial, sans-serif;
+  --font-serif: "Noto Serif Bengali", "Tiro Bangla", serif;
+  --font-sans: "Inter", "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Base transitions */
+:root {
+  color-scheme: light dark;
+}
+html.dark {
+  color-scheme: dark;
 }
