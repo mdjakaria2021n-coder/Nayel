@@ -3,7 +3,7 @@ import { LESSONS, Lesson } from '../data/lessons';
 import TypingEngine from './TypingEngine';
 import JuktakkhorChart from './JuktakkhorChart';
 import { useProgress } from '../hooks/useProgress';
-import { Keyboard, BookOpen, GraduationCap, BarChart2, CheckCircle2, LayoutDashboard, Target, Activity, Moon, Sun, Volume2, VolumeX, Edit3, Play } from 'lucide-react';
+import { Keyboard, BookOpen, GraduationCap, BarChart2, CheckCircle2, LayoutDashboard, Target, Activity, Moon, Sun, Volume2, VolumeX, Edit3, Play, Lock } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 
@@ -21,7 +21,7 @@ export default function Dashboard() {
   const [customText, setCustomText] = useState('');
 
   // Progress
-  const { history, saveResult, maxWpm } = useProgress();
+  const { history, saveResult, maxWpm, unlockedLevel } = useProgress();
 
   // Handle Dark mode class
   useEffect(() => {
@@ -36,7 +36,8 @@ export default function Dashboard() {
     saveResult({
       wpm: stats.wpm,
       accuracy: stats.accuracy,
-      mode: playMode
+      mode: playMode,
+      lessonId: typeof activeLesson?.id === 'number' ? activeLesson.id : 0
     });
   };
 
@@ -135,22 +136,30 @@ export default function Dashboard() {
                 <p className="text-slate-500 dark:text-slate-400 mb-6 font-sans">ধাপে ধাপে বিজয়ী কীবোর্ড টাইপিং শিখুন। প্রথমে প্র্যাকটিস মোডে হাত ক্লিয়ার করুন।</p>
                 
                 <div className="grid sm:grid-cols-2 gap-4">
-                  {LESSONS.map((lesson) => (
-                    <button
-                      key={lesson.id}
-                      onClick={() => { setActiveLesson(lesson); setActiveView('lesson'); }}
-                      className="group text-left p-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-blue-300 dark:hover:border-blue-500 hover:shadow-md transition-all flex justify-between items-start"
-                    >
-                      <div>
-                        <span className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-2 block font-sans">{lesson.level}</span>
-                        <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{lesson.title}</h3>
-                        <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{lesson.description}</p>
-                      </div>
-                      <div className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-700 flex items-center justify-center group-hover:bg-blue-50 dark:group-hover:bg-blue-900 shrink-0">
-                        <Play className="w-4 h-4 text-slate-400 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 translate-x-0.5" />
-                      </div>
-                    </button>
-                  ))}
+                  {LESSONS.map((lesson) => {
+                    const isLocked = lesson.id > unlockedLevel;
+                    return (
+                      <button
+                        key={lesson.id}
+                        onClick={() => { if (!isLocked) { setActiveLesson(lesson); setActiveView('lesson'); } }}
+                        disabled={isLocked}
+                        className={cn("group text-left p-5 rounded-xl border transition-all flex justify-between items-start relative overflow-hidden", isLocked ? "border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 opacity-60 cursor-not-allowed" : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-blue-300 dark:hover:border-blue-500 hover:shadow-md")}
+                      >
+                        <div>
+                          <span className={cn("text-xs font-bold uppercase tracking-wider mb-2 block font-sans", isLocked ? "text-slate-500" : "text-blue-600 dark:text-blue-400")}>{lesson.level}</span>
+                          <h3 className={cn("text-lg font-bold mb-1 transition-colors relative z-10", isLocked ? "text-slate-500" : "text-slate-800 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400")}>{lesson.title}</h3>
+                          <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 relative z-10">{lesson.description}</p>
+                        </div>
+                        <div className={cn("w-10 h-10 rounded-full flex items-center justify-center shrink-0 relative z-10 transition-colors", isLocked ? "bg-slate-200 dark:bg-slate-700" : "bg-slate-50 dark:bg-slate-700 group-hover:bg-blue-50 dark:group-hover:bg-blue-900")}>
+                          {isLocked ? (
+                            <Lock className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                          ) : (
+                            <Play className="w-4 h-4 text-slate-400 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 translate-x-0.5" />
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 

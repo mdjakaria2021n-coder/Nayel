@@ -35,6 +35,7 @@ export default function TypingEngine({ lesson, mode, soundEnabled, onComplete }:
   const [stats, setStats] = useState({ wpm: 0, accuracy: 100, cpm: 0 });
 
   const [inputValue, setInputValue] = useState('');
+  const [charFails, setCharFails] = useState<Record<number, number>>({});
 
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -158,6 +159,7 @@ export default function TypingEngine({ lesson, mode, soundEnabled, onComplete }:
       });
       setErrors(prev => prev + 1);
       setErrorKeys(prev => ({ ...prev, [expectedChar]: (prev[expectedChar] || 0) + 1 }));
+      setCharFails(prev => ({ ...prev, [currentIndex]: (prev[currentIndex] || 0) + 1 }));
     }
     
     setTimeout(() => setPressedKey(null), 100);
@@ -185,6 +187,7 @@ export default function TypingEngine({ lesson, mode, soundEnabled, onComplete }:
     setIsFinished(false);
     setStats({ wpm: 0, accuracy: 100, cpm: 0 });
     setInputValue('');
+    setCharFails({});
     inputRef.current?.focus();
   };
 
@@ -203,6 +206,8 @@ export default function TypingEngine({ lesson, mode, soundEnabled, onComplete }:
   const timeDisplay = mode === 'exam' 
     ? `${Math.floor((EXAM_TIME_LIMIT - currentTime) / 60)}:${((EXAM_TIME_LIMIT - currentTime) % 60).toString().padStart(2, '0')}` // Countdown
     : `${Math.floor(currentTime / 60)}:${(currentTime % 60).toString().padStart(2, '0')}`; // Count up
+
+  const wpmColor = stats.wpm === 0 ? "" : stats.wpm < 10 ? "text-red-500 dark:text-red-400" : stats.wpm <= 20 ? "text-amber-500 dark:text-amber-400" : "text-green-500 dark:text-green-400";
 
   return (
     <div 
@@ -235,7 +240,7 @@ export default function TypingEngine({ lesson, mode, soundEnabled, onComplete }:
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatBox label="শব্দ / মিনিট (WPM)" value={stats.wpm} icon={<Activity className="w-5 h-5 opacity-60" />} />
+        <StatBox label="শব্দ / মিনিট (WPM)" value={stats.wpm} icon={<Activity className="w-5 h-5 opacity-60" />} valueClassName={wpmColor} />
         <StatBox label="সঠিক (Accuracy)" value={`${stats.accuracy}%`} icon={<Target className="w-5 h-5 opacity-60" />} />
         <StatBox label="ভুল (Errors)" value={errors} icon={<AlertTriangle className="w-5 h-5 opacity-60" />} />
         <StatBox label="সময় (Time)" value={timeDisplay} icon={<Timer className="w-5 h-5 opacity-60" />} alert={mode === 'exam' && EXAM_TIME_LIMIT - currentTime <= 60} />
@@ -301,6 +306,7 @@ export default function TypingEngine({ lesson, mode, soundEnabled, onComplete }:
 
                     const status = typedInputs[absIdx];
                     const isCurrent = absIdx === currentIndex;
+                    const fails = charFails[absIdx] || 0;
 
                     return (
                       <span 
@@ -312,14 +318,19 @@ export default function TypingEngine({ lesson, mode, soundEnabled, onComplete }:
                           isCurrent && "border-b-[3px] border-blue-500 text-blue-600 dark:text-blue-400 pb-0.5"
                         )}
                       >
+                        {isCurrent && fails === 1 && (
+                          <div className="absolute -top-10 left-1/2 -translate-x-1/2 text-xs font-sans font-bold text-red-500 bg-red-50 dark:bg-red-900/40 px-2 py-1 rounded shadow animate-bounce break-normal text-center min-w-[max-content]">
+                             Key: {char}
+                          </div>
+                        )}
                         {char}
                       </span>
                     );
                   })}
                 </div>
-                {word.hint && (
-                  <div className="mt-3 text-sm font-sans font-bold text-blue-500 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded">
-                    {word.hint}
+                {word.hint && isActive && (charFails[currentIndex] >= 3) && (
+                  <div className="mt-3 text-sm font-sans font-bold text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-4 py-2 rounded animate-pulse border border-red-200 dark:border-red-900/50 shadow-sm text-center">
+                    সঠিক নিয়ম: {word.hint}
                   </div>
                 )}
               </div>
@@ -354,7 +365,7 @@ export default function TypingEngine({ lesson, mode, soundEnabled, onComplete }:
       </div>
 
       <VirtualKeyboard 
-        expectedKey={!isFinished ? fullKeysString[currentIndex] : null} 
+        expectedKey={!isFinished && (charFails[currentIndex] >= 2) ? fullKeysString[currentIndex] : null} 
         pressedKey={pressedKey} 
         onKeyClick={(keyId) => {
           if (keyId.includes('Shift')) {
@@ -369,7 +380,7 @@ export default function TypingEngine({ lesson, mode, soundEnabled, onComplete }:
   );
 }
 
-function StatBox({ label, value, icon, alert }: { label: string, value: string | number, icon: React.ReactNode, alert?: boolean }) {
+function StatBox({ label, value, icon, alert, valueClassName }: { label: string, value: string | number, icon: React.ReactNode, alert?: boolean, valueClassName?: string }) {
   return (
     <div className={cn(
       "bg-white dark:bg-slate-800 p-4 rounded-xl border text-left shadow-sm flex items-center justify-between",
@@ -379,7 +390,7 @@ function StatBox({ label, value, icon, alert }: { label: string, value: string |
         <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1 font-serif">{label}</span>
         <span className={cn(
           "text-2xl font-bold block leading-none",
-          alert ? "text-red-600 dark:text-red-400 animate-pulse" : "text-slate-800 dark:text-slate-100"
+          valueClassName || (alert ? "text-red-600 dark:text-red-400 animate-pulse" : "text-slate-800 dark:text-slate-100")
         )}>
           {value}
         </span>
