@@ -32,13 +32,22 @@ export default function Dashboard() {
     }
   }, [isDarkMode]);
 
-  const handleLessonComplete = (stats: { wpm: number; accuracy: number; cpm: number }) => {
+  const handleLessonComplete = (stats: { wpm: number; accuracy: number; cpm: number; errorKeys: Record<string, number> }) => {
     saveResult({
       wpm: stats.wpm,
       accuracy: stats.accuracy,
       mode: playMode,
-      lessonId: 0
+      lessonId: typeof activeLesson?.id === 'number' ? activeLesson.id : 0
     });
+  };
+
+  const handleNextLesson = () => {
+    const currentIndex = LESSONS.findIndex(l => l.id === activeLesson?.id);
+    if (currentIndex >= 0 && currentIndex < LESSONS.length - 1) {
+      setActiveLesson(LESSONS[currentIndex + 1]);
+    } else {
+      setActiveView('dashboard');
+    }
   };
 
   const startCustomLesson = () => {
@@ -283,6 +292,8 @@ export default function Dashboard() {
               mode={playMode}
               soundEnabled={soundEnabled}
               onComplete={handleLessonComplete} 
+              onNextLesson={handleNextLesson}
+              onBack={() => setActiveView('dashboard')}
             />
           </div>
         )}
