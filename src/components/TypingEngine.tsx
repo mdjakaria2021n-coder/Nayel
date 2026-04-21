@@ -5,6 +5,15 @@ import { Play, RotateCcw, Activity, Target, Timer, AlertTriangle, ArrowLeft } fr
 import { cn } from '../lib/utils';
 import { playSound } from '../lib/sound';
 
+export const formatKeyDisplay = (char: string) => {
+  if (char === '&') return 'Shift+7';
+  if (char === '|') return 'Shift+\\';
+  if (char === '\\') return '\\';
+  if (char === ' ') return 'Space';
+  if (char >= 'A' && char <= 'Z') return `Shift+${char}`;
+  return char.toUpperCase();
+};
+
 export interface TypingEngineProps {
   key?: React.Key;
   lesson: Lesson;
@@ -179,9 +188,9 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
     const nativeMap: Record<string, string> = {
       'অ': 'F', 'আ': 'f', 'ি': 'd', 'ী': 'D', 'ু': 's', 'ূ': 'S', 'ৃ': 'a', 'ে': 'c', 'ৈ': 'C', 'ো': 'x', 'ৌ': 'X',
       'ক': 'j', 'খ': 'J', 'গ': 'o', 'ঘ': 'O', 'ঙ': 'q', 'চ': 'y', 'ছ': 'Y', 'জ': 'u', 'ঝ': 'U', 'ঞ': 'I',
-      'ট': 't', 'ঠ': 'T', 'ড': 'e', 'ঢ': 'E', 'ণ': 'w', 'ত': 'k', 'থ': 'K', 'দ': 'l', 'ধ': 'L', 'ন': 'b',
-      'প': 'r', 'ফ': 'R', 'ব': 'h', 'ভ': 'H', 'ম': 'm', 'য': 'W', 'র': 'v', 'ল': 'V', 'শ': 'M', 'ষ': 'N', 'স': 'n', 'হ': 'i',
-      'ড়': 'p', 'ঢ়': 'P', 'য়': 'z', 'ৎ': 'Z', 'ং': 'B', 'ঃ': ':', 'ঁ': '^', '্': 'g', '।': 'G'
+      'ট': 't', 'ঠ': 'T', 'ড': 'e', 'ঢ': 'E', 'ণ': 'B', 'ত': 'k', 'থ': 'K', 'দ': 'l', 'ধ': 'L', 'ন': 'b',
+      'প': 'r', 'ফ': 'R', 'ব': 'h', 'ভ': 'H', 'ম': 'm', 'য': 'w', 'র': 'v', 'ল': 'V', 'শ': 'M', 'ষ': 'N', 'স': 'n', 'হ': 'i',
+      'ড়': 'p', 'ঢ়': 'P', 'ব়': 'W', 'য়': '&', 'ৎ': '\\', 'ং': '|', 'ঃ': 'Z', 'ঁ': 'Q', '্': 'z', '।': 'G'
     };
     return nativeMap[char] || char;
   };
@@ -276,8 +285,15 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
          {/* Hint Area */}
          {!isFinished && (
            <div className="flex flex-col items-center min-h-[60px]">
-               <div className="text-xl sm:text-2xl font-mono px-6 py-2 rounded-xl bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shadow-sm transition-all duration-300 min-w-[120px] text-center font-bold tracking-widest">
-                  {isTypingSpace ? "Space bar" : (fails >= 2 ? (currentWord?.hint || currentWord?.keys) : fails === 1 ? currentWord?.keys : "••••")}
+               <div className="flex flex-wrap justify-center items-center gap-1 sm:gap-2 text-xl sm:text-2xl font-mono px-6 py-2 rounded-xl bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shadow-sm transition-all duration-300 min-w-[200px] text-center font-bold tracking-widest">
+                  {isTypingSpace ? "Space bar" : (
+                     currentWord?.keys.split('').map((char, i) => (
+                       <React.Fragment key={i}>
+                         {i > 0 && <span className="opacity-50 mx-1">→</span>}
+                         <span>{formatKeyDisplay(char)}</span>
+                       </React.Fragment>
+                     ))
+                  )}
                </div>
                {(fails >= 1) && (
                   <div className={cn("mt-2 text-xs sm:text-sm font-sans px-3 py-1 rounded-full transition-colors font-bold", fails >= 3 ? "text-red-700 bg-red-100 dark:bg-red-900/40 dark:text-red-300 animate-pulse" : "text-amber-700 bg-amber-100 dark:bg-amber-900/40 dark:text-amber-300")}>

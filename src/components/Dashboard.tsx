@@ -37,7 +37,7 @@ export default function Dashboard() {
       wpm: stats.wpm,
       accuracy: stats.accuracy,
       mode: playMode,
-      lessonId: typeof activeLesson?.id === 'number' ? activeLesson.id : 0
+      lessonId: 0
     });
   };
 
@@ -136,8 +136,8 @@ export default function Dashboard() {
                 <p className="text-slate-500 dark:text-slate-400 mb-6 font-sans">ধাপে ধাপে বিজয়ী কীবোর্ড টাইপিং শিখুন। প্রথমে প্র্যাকটিস মোডে হাত ক্লিয়ার করুন।</p>
                 
                 <div className="grid sm:grid-cols-2 gap-4">
-                  {LESSONS.map((lesson) => {
-                    const isLocked = lesson.id > unlockedLevel;
+                  {LESSONS.map((lesson, idx) => {
+                    const isLocked = false; // Adaptive unlocking could be based on idx instead, or disable lock for now
                     return (
                       <button
                         key={lesson.id}
