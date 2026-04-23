@@ -139,8 +139,16 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
       return;
     }
     
-    if (e.key === ' ') {
-      e.preventDefault(); // scroll block করবে
+    // Space bar detect করার সঠিক নিয়ম
+    if (e.code === 'Space' || e.key === ' ') {
+      e.preventDefault(); // page scroll বন্ধ
+      
+      const expectedChar = expectedKeysSequence[currentIndex];
+      // currentWordComplete = true হলেই Space কাজ করবে
+      if (expectedChar === 'Space') {
+        handleKeyInput('Space');
+      }
+      return; // Word শেষ না হলে Space চাপলে error count করবে না, শুধু ignore করবে
     }
 
     if (e.key === 'Backspace') {
@@ -364,7 +372,7 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
              {/* Hint Area */}
              <div className="flex flex-col items-center min-h-[50px] sm:min-h-[60px]">
                  <div className="flex flex-wrap justify-center items-center gap-1 sm:gap-2 text-lg sm:text-xl font-mono px-4 sm:px-6 py-1.5 sm:py-2 rounded-xl bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shadow-sm transition-all duration-300 min-w-[150px] sm:min-w-[200px] text-center font-bold tracking-widest">
-                    {isTypingSpace ? "Space bar" : (
+                    {isTypingSpace ? "Space চাপুন →" : (
                        currentWord?.bangla ? getWordKeysArray(currentWord.bangla).filter(k => k !== 'Space').map((char, i) => (
                          <React.Fragment key={i}>
                            {i > 0 && <span className="opacity-50 mx-1">→</span>}
