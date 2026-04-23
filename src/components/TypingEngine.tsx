@@ -114,20 +114,66 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
     }
   }, [countdown, onNextLesson]);
 
+  useEffect(() => {
+    const handleGlobalClick = () => {
+      document.getElementById('typingInput')?.focus();
+    };
+    document.addEventListener('click', handleGlobalClick);
+    return () => document.removeEventListener('click', handleGlobalClick);
+  }, []);
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (isFinished) return;
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     
     // Ignore meta/actions entirely so they don't increment errors
-    if (['Shift', 'CapsLock', 'Control', 'Alt', 'Meta', 'Tab', 'Enter', 'Escape', 'Backspace'].includes(e.key)) {
+    if (['Shift', 'CapsLock', 'Control', 'Alt', 'Meta', 'Tab', 'Escape'].includes(e.key)) {
       if (e.key === 'Shift') {
         setPressedKey(`Shift_${e.location === 1 ? 'L' : 'R'}`);
         setTimeout(() => setPressedKey(null), 100);
       }
+      if (['Tab', 'Escape'].includes(e.key)) e.preventDefault(); // Block scroll/focus loss
       return;
     }
     
-    e.preventDefault();
+    if (e.key === 'Enter') {
+      e.preventDefault(); // Enter চাপলে next word যাবে না
+      return;
+    }
+    
+    if (e.key === ' ') {
+      e.preventDefault(); // scroll block করবে
+    }
+
+    if (e.key === 'Backspace') {
+      // Find the start index of the current word
+      let activeAccumulator = 0;
+      for (let i = 0; i < lesson.words.length; i++) {
+        const wordKeyCount = getWordKeysArray(lesson.words[i].bangla).filter(k => k !== 'Space').length;
+        if (currentIndex >= activeAccumulator && currentIndex < activeAccumulator + wordKeyCount + 1) {
+          break;
+        }
+        activeAccumulator += wordKeyCount + 1;
+      }
+      
+      const correctCharsInCurrentWord = currentIndex - activeAccumulator;
+      
+      // If there are extra wrong characters in the input, just let native backspace remove them without going back in the global sequence
+      if (inputValue.length > correctCharsInCurrentWord) {
+         // Do nothing to engine state, let native input remove character via onChange
+         return;
+      }
+
+      if (currentIndex > 0 && expectedKeysSequence[currentIndex - 1] !== 'Space') {
+        setCurrentIndex(prev => prev - 1);
+        setTypedInputs(prev => {
+          const next = [...prev];
+          next[currentIndex - 1] = null;
+          return next;
+        });
+      }
+      return;
+    }
 
     const codeToChar: Record<string, string> = {
       KeyA: 'A', KeyB: 'B', KeyC: 'C', KeyD: 'D', KeyE: 'E', KeyF: 'F', KeyG: 'G', KeyH: 'H', KeyI: 'I', KeyJ: 'J', KeyK: 'K', KeyL: 'L', KeyM: 'M', KeyN: 'N', KeyO: 'O', KeyP: 'P', KeyQ: 'Q', KeyR: 'R', KeyS: 'S', KeyT: 'T', KeyU: 'U', KeyV: 'V', KeyW: 'W', KeyX: 'X', KeyY: 'Y', KeyZ: 'Z',
@@ -145,7 +191,7 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
          typedChar = e.shiftKey ? `Shift+${baseCode}` : baseCode;
       }
     } else {
-       return; // ignore unknown keys completely
+       // if we can't map physical key but it's a character, we could fallback, but let's just proceed
     }
 
     handleKeyInput(typedChar);
@@ -155,7 +201,7 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
     if (isFinished) return;
     if (!startTime) setStartTime(Date.now());
     
-    // Safety matching
+    // Safety exact matching (trim bypass)
     if (typedChar === ' ') typedChar = 'Space';
 
     setPressedKey(typedChar);
@@ -312,19 +358,13 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
           {/* Typing Box 15% */}
           <div className="h-[15dvh] flex items-center justify-center p-2 sm:p-4 bg-transparent shrink-0">
              <input 
+                id="typingInput"
                 ref={inputRef}
                 type="text" 
                 autoFocus
                 value={inputValue}
                 onChange={(e) => {
-                  const val = e.target.value;
-                  if (val.length > inputValue.length) {
-                    const addedChar = val.slice(-1);
-                    handleKeyInput(getQwertyChar(addedChar));
-                    setInputValue(val);
-                  } else {
-                    setInputValue(val);
-                  }
+                  setInputValue(e.target.value);
                 }}
                 onKeyDown={handleKeyDown}
                 className="w-full max-w-sm text-center text-3xl sm:text-4xl font-serif py-3 sm:py-4 rounded-xl border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 shadow-inner"

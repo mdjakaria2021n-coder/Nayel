@@ -54,7 +54,7 @@ export const BIJOY_MAP: Record<string, string[]> = {
   'ব': ['H'],
   'ভ': ['Shift+H'],
   'ম': ['M'],
-  'য': ['W'],
+  'য': ['Shift+W'],
   'র': ['V'],
   'ল': ['Shift+V'],
   'শ': ['Shift+M'],
@@ -63,13 +63,13 @@ export const BIJOY_MAP: Record<string, string[]> = {
   'হ': ['I'],
   'ড়': ['P'],
   'ঢ়': ['Shift+P'],
-  'য়': ['Shift+7'],
+  'য়': ['W'],
   'ৎ': ['\\'],
 };
 
 export function getWordKeysArray(word: string): string[] {
   const result: string[] = [];
-  for (const char of word) {
+  for (const char of [...word]) {
     if (BIJOY_MAP[char]) {
       result.push(...BIJOY_MAP[char]);
     } else {
@@ -92,7 +92,7 @@ export const BIJOY_MAPPING: Record<string, { nom: string; shift: string; finger:
   '4': { nom: '৪', shift: '$', finger: 'l-index' },
   '5': { nom: '৫', shift: '%', finger: 'l-index' },
   '6': { nom: '৬', shift: '^', finger: 'r-index' },
-  '7': { nom: '৭', shift: 'য়', finger: 'r-index' }, // য় = Shift+7
+  '7': { nom: '৭', shift: '&', finger: 'r-index' },
   '8': { nom: '৮', shift: '*', finger: 'r-middle' },
   '9': { nom: '৯', shift: '(', finger: 'r-ring' },
   '0': { nom: '০', shift: ')', finger: 'r-pinky' },
@@ -101,7 +101,7 @@ export const BIJOY_MAPPING: Record<string, { nom: string; shift: string; finger:
   
   // QWERTY Row
   'q': { nom: 'ঙ', shift: '', finger: 'l-pinky' },
-  'w': { nom: 'য', shift: '', finger: 'l-ring' },
+  'w': { nom: 'য়', shift: 'য', finger: 'l-ring' },
   'e': { nom: 'ড', shift: 'ঢ', finger: 'l-middle' },
   'r': { nom: 'প', shift: 'ফ', finger: 'l-index' },
   't': { nom: 'ট', shift: 'ঠ', finger: 'l-index' },
