@@ -61,9 +61,12 @@ export const BIJOY_MAP: Record<string, string[]> = {
   'ষ': ['Shift+N'],
   'স': ['N'],
   'হ': ['I'],
-  'ড়': ['P'],
-  'ঢ়': ['Shift+P'],
-  'য়': ['W'],
+  'ড়': ['P'], // U+09DC
+  'ড়': ['P'], // U+09A1 U+09BC (fallback)
+  'ঢ়': ['Shift+P'], // U+09DD
+  'ঢ়': ['Shift+P'], // U+09A2 U+09BC (fallback)
+  'য়': ['W'], // U+09DF
+  'য়': ['W'], // U+09AF U+09BC (fallback)
   'ৎ': ['\\'],
 };
 
