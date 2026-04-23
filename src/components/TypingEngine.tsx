@@ -4,14 +4,10 @@ import VirtualKeyboard from './VirtualKeyboard';
 import { Play, RotateCcw, Activity, Target, Timer, AlertTriangle, ArrowLeft } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { playSound } from '../lib/sound';
+import { getWordKeysArray } from '../lib/bijoy-mapping';
 
 export const formatKeyDisplay = (char: string) => {
-  if (char === '&') return 'Shift+7';
-  if (char === '|') return 'Shift+\\';
-  if (char === '\\') return '\\';
-  if (char === ' ') return 'Space';
-  if (char >= 'A' && char <= 'Z') return `Shift+${char}`;
-  return char.toUpperCase();
+  return char; // Output exactly the mapped key (e.g., 'Shift+F', 'J', 'G')
 };
 
 export interface TypingEngineProps {
@@ -25,18 +21,18 @@ export interface TypingEngineProps {
 }
 
 export default function TypingEngine({ lesson, mode = 'practice', soundEnabled = true, onComplete, onNextLesson, onBack }: TypingEngineProps) {
-  const fullTextObject = lesson.words.flatMap((word, i) => {
-    const chars = word.keys.split('').map(k => ({ expected: k, label: '' }));
+  const expectedKeysSequence = lesson.words.flatMap((word, i) => {
+    let keys = getWordKeysArray(word.bangla);
+    // filter out any unexpected spaces inside word
+    keys = keys.filter(k => k !== 'Space');
     if (i < lesson.words.length - 1) {
-      chars.push({ expected: ' ', label: ' ' });
+      return [...keys, 'Space'];
     }
-    return chars;
+    return keys;
   });
 
-  const fullKeysString = fullTextObject.map(c => c.expected).join('');
-
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [typedInputs, setTypedInputs] = useState<('correct' | 'wrong' | null)[]>(new Array(fullKeysString.length).fill(null));
+  const [typedInputs, setTypedInputs] = useState<('correct' | 'wrong' | null)[]>(new Array(expectedKeysSequence.length).fill(null));
   const [startTime, setStartTime] = useState<number | null>(null);
   const [currentTime, setCurrentTime] = useState<number>(0); // Keeps track of passing seconds
   const [errors, setErrors] = useState(0);
@@ -133,22 +129,23 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
     
     e.preventDefault();
 
-    // Map physical keys natively for Bijoy handling isolation
     const codeToChar: Record<string, string> = {
-      KeyA: 'a', KeyB: 'b', KeyC: 'c', KeyD: 'd', KeyE: 'e', KeyF: 'f', KeyG: 'g', KeyH: 'h', KeyI: 'i', KeyJ: 'j', KeyK: 'k', KeyL: 'l', KeyM: 'm', KeyN: 'n', KeyO: 'o', KeyP: 'p', KeyQ: 'q', KeyR: 'r', KeyS: 's', KeyT: 't', KeyU: 'u', KeyV: 'v', KeyW: 'w', KeyX: 'x', KeyY: 'y', KeyZ: 'z',
+      KeyA: 'A', KeyB: 'B', KeyC: 'C', KeyD: 'D', KeyE: 'E', KeyF: 'F', KeyG: 'G', KeyH: 'H', KeyI: 'I', KeyJ: 'J', KeyK: 'K', KeyL: 'L', KeyM: 'M', KeyN: 'N', KeyO: 'O', KeyP: 'P', KeyQ: 'Q', KeyR: 'R', KeyS: 'S', KeyT: 'T', KeyU: 'U', KeyV: 'V', KeyW: 'W', KeyX: 'X', KeyY: 'Y', KeyZ: 'Z',
       Digit1: '1', Digit2: '2', Digit3: '3', Digit4: '4', Digit5: '5', Digit6: '6', Digit7: '7', Digit8: '8', Digit9: '9', Digit0: '0',
-      Minus: '-', Equal: '=', BracketLeft: '[', BracketRight: ']', Backslash: '\\', Semicolon: ';', Quote: "'", Comma: ',', Period: '.', Slash: '/', Backquote: '`', Space: ' '
-    };
-    const shiftMap: Record<string, string> = {
-      '`': '~', '1': '!', '2': '@', '3': '#', '4': '$', '5': '%', '6': '^', '7': '&', '8': '*', '9': '(', '0': ')',
-      '-': '_', '=': '+', '[': '{', ']': '}', '\\': '|', ';': ':', "'": '"', ',': '<', '.': '>', '/': '?'
+      Minus: '-', Equal: '=', BracketLeft: '[', BracketRight: ']', Backslash: '\\', Semicolon: ';', Quote: "'", Comma: ',', Period: '.', Slash: '/', Backquote: '`', Space: 'Space'
     };
 
-    let baseChar = codeToChar[e.code];
+    let baseCode = codeToChar[e.code];
     let typedChar = e.key;
 
-    if (baseChar) {
-       typedChar = e.shiftKey ? (shiftMap[baseChar] || baseChar.toUpperCase()) : baseChar;
+    if (baseCode) {
+      if (baseCode === 'Space') {
+         typedChar = 'Space';
+      } else {
+         typedChar = e.shiftKey ? `Shift+${baseCode}` : baseCode;
+      }
+    } else {
+       return; // ignore unknown keys completely
     }
 
     handleKeyInput(typedChar);
@@ -157,11 +154,13 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
   const handleKeyInput = (typedChar: string) => {
     if (isFinished) return;
     if (!startTime) setStartTime(Date.now());
-    if (typedChar === 'Space') typedChar = ' ';
+    
+    // Safety matching
+    if (typedChar === ' ') typedChar = 'Space';
 
     setPressedKey(typedChar);
 
-    const expectedChar = fullKeysString[currentIndex];
+    const expectedChar = expectedKeysSequence[currentIndex];
 
     if (typedChar === expectedChar) {
       playSound('correct', soundEnabled);
@@ -171,15 +170,11 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
         return next;
       });
       
-      if (typedChar === ' ') {
+      if (typedChar === 'Space') {
         setInputValue('');
       }
 
-      if (typedChar === ' ') {
-        setInputValue('');
-      }
-
-      if (currentIndex + 1 >= fullKeysString.length) {
+      if (currentIndex + 1 >= expectedKeysSequence.length) {
         finishLesson();
       } else {
         setCurrentIndex(prev => prev + 1);
@@ -200,26 +195,19 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
   };
 
   const getQwertyChar = (char: string) => {
-    // Reverse simple mapping if they output proper bangla keys
-    const nativeMap: Record<string, string> = {
-      'অ': 'F', 'আ': 'f', 'ি': 'd', 'ী': 'D', 'ু': 's', 'ূ': 'S', 'ৃ': 'a', 'ে': 'c', 'ৈ': 'C', 'ো': 'x', 'ৌ': 'X',
-      'ক': 'j', 'খ': 'J', 'গ': 'o', 'ঘ': 'O', 'ঙ': 'q', 'চ': 'y', 'ছ': 'Y', 'জ': 'u', 'ঝ': 'U', 'ঞ': 'I',
-      'ট': 't', 'ঠ': 'T', 'ড': 'e', 'ঢ': 'E', 'ণ': 'B', 'ত': 'k', 'থ': 'K', 'দ': 'l', 'ধ': 'L', 'ন': 'b',
-      'প': 'r', 'ফ': 'R', 'ব': 'h', 'ভ': 'H', 'ম': 'm', 'য': 'w', 'র': 'v', 'ল': 'V', 'শ': 'M', 'ষ': 'N', 'স': 'n', 'হ': 'i',
-      'ড়': 'p', 'ঢ়': 'P', 'ব়': 'W', 'য়': '&', 'ৎ': '\\', 'ং': '|', 'ঃ': 'Z', 'ঁ': 'Q', '্': 'z', '।': 'G'
-    };
-    return nativeMap[char] || char;
+    return char;
   };
 
   const reset = () => {
     setCurrentIndex(0);
-    setTypedInputs(new Array(fullKeysString.length).fill(null));
+    setTypedInputs(new Array(expectedKeysSequence.length).fill(null));
     setStartTime(null);
     setCurrentTime(0);
     setErrors(0);
     setErrorKeys({});
     setIsFinished(false);
     setStats({ wpm: 0, accuracy: 100, cpm: 0 });
+    setCountdown(null);
     setInputValue('');
     setCharFails({});
     inputRef.current?.focus();
@@ -228,8 +216,9 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
   let accumulatedKeys = 0;
   let activeWordIndex = 0;
   for (let i = 0; i < lesson.words.length; i++) {
-    const wordKeyCount = lesson.words[i].keys.length;
-    if (currentIndex >= accumulatedKeys && currentIndex <= accumulatedKeys + wordKeyCount) {
+    const wordKeyCount = getWordKeysArray(lesson.words[i].bangla).filter(k => k !== 'Space').length;
+    // adding 1 representing the space expected after a word
+    if (currentIndex >= accumulatedKeys && currentIndex < accumulatedKeys + wordKeyCount + 1) {
       activeWordIndex = i;
       break;
     }
@@ -253,8 +242,8 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
   const groupTotal = end - start + 1;
   const groupIndex = activeWordIndex - start + 1;
 
-  const expectedChar = fullKeysString[currentIndex];
-  const isTypingSpace = expectedChar === ' ';
+  const expectedChar = expectedKeysSequence[currentIndex];
+  const isTypingSpace = expectedChar === 'Space';
   const fails = charFails[currentIndex] || 0;
 
   return (
@@ -304,12 +293,12 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
              <div className="flex flex-col items-center min-h-[60px]">
                  <div className="flex flex-wrap justify-center items-center gap-1 sm:gap-2 text-xl sm:text-2xl font-mono px-6 py-2 rounded-xl bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shadow-sm transition-all duration-300 min-w-[200px] text-center font-bold tracking-widest">
                     {isTypingSpace ? "Space bar" : (
-                       currentWord?.keys.split('').map((char, i) => (
+                       currentWord?.bangla ? getWordKeysArray(currentWord.bangla).filter(k => k !== 'Space').map((char, i) => (
                          <React.Fragment key={i}>
                            {i > 0 && <span className="opacity-50 mx-1">→</span>}
-                           <span>{formatKeyDisplay(char)}</span>
+                           <span>{char}</span>
                          </React.Fragment>
-                       ))
+                       )) : null
                     )}
                  </div>
                  {(fails >= 1) && (
@@ -347,7 +336,7 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
           <div className="flex-1 w-full flex items-end justify-center pb-2 sm:pb-4 bg-slate-100 dark:bg-slate-950 overflow-hidden shrink-0 shadow-[inset_0_10px_20px_-10px_rgba(0,0,0,0.05)] pt-2 border-t border-slate-200 dark:border-slate-800">
              <div className="w-full h-full max-w-5xl mx-auto overflow-x-auto overflow-y-hidden flex items-end justify-center px-1 transform origin-bottom scale-[0.85] sm:scale-100">
                <VirtualKeyboard 
-                 expectedKey={(fails >= 2) ? fullKeysString[currentIndex] : null} 
+                 expectedKey={(fails >= 2) ? expectedKeysSequence[currentIndex] : null} 
                  pressedKey={pressedKey} 
                  onKeyClick={(keyId) => {
                    if (keyId.includes('Shift')) {

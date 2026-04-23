@@ -1,3 +1,88 @@
+export const BIJOY_MAP: Record<string, string[]> = {
+  // স্বরবর্ণ
+  'অ': ['Shift+F'],
+  'আ': ['G', 'F'],
+  'ই': ['G', 'D'],
+  'ঈ': ['G', 'Shift+D'],
+  'উ': ['G', 'S'],
+  'ঊ': ['G', 'Shift+S'],
+  'ঋ': ['G', 'A'],
+  'এ': ['G', 'C'],
+  'ঐ': ['G', 'Shift+C'],
+  'ও': ['X'],
+  'ঔ': ['G', 'Shift+X'],
+
+  // কার
+  'া': ['F'],
+  'ি': ['D'],
+  'ী': ['Shift+D'],
+  'ু': ['S'],
+  'ূ': ['Shift+S'],
+  'ৃ': ['A'],
+  'ে': ['C'],
+  'ৈ': ['Shift+C'],
+  'ো': ['X'],
+  'ৌ': ['Shift+X'],
+  'ঁ': ['Shift+A'],
+  'ং': ['G'],
+  'ঃ': ['Shift+Z'],
+  '্': ['Z'],
+
+  // ব্যঞ্জনবর্ণ
+  'ক': ['J'],
+  'খ': ['Shift+J'],
+  'গ': ['O'],
+  'ঘ': ['Shift+O'],
+  'ঙ': ['Q'],
+  'চ': ['Y'],
+  'ছ': ['Shift+Y'],
+  'জ': ['U'],
+  'ঝ': ['Shift+U'],
+  'ঞ': ['Shift+I'],
+  'ট': ['T'],
+  'ঠ': ['Shift+T'],
+  'ড': ['E'],
+  'ঢ': ['Shift+E'],
+  'ণ': ['Shift+B'],
+  'ত': ['K'],
+  'থ': ['Shift+K'],
+  'দ': ['L'],
+  'ধ': ['Shift+L'],
+  'ন': ['B'],
+  'প': ['R'],
+  'ফ': ['Shift+R'],
+  'ব': ['H'],
+  'ভ': ['Shift+H'],
+  'ম': ['M'],
+  'য': ['W'],
+  'র': ['V'],
+  'ল': ['Shift+V'],
+  'শ': ['Shift+M'],
+  'ষ': ['Shift+N'],
+  'স': ['N'],
+  'হ': ['I'],
+  'ড়': ['P'],
+  'ঢ়': ['Shift+P'],
+  'য়': ['Shift+7'],
+  'ৎ': ['\\'],
+};
+
+export function getWordKeysArray(word: string): string[] {
+  const result: string[] = [];
+  for (const char of word) {
+    if (BIJOY_MAP[char]) {
+      result.push(...BIJOY_MAP[char]);
+    } else {
+      result.push(char === ' ' ? 'Space' : char);
+    }
+  }
+  return result;
+}
+
+export function getWordKeys(word: string): string {
+  return getWordKeysArray(word).join(' → ');
+}
+
 export const BIJOY_MAPPING: Record<string, { nom: string; shift: string; finger: string }> = {
   // Numbers / Top row
   '`': { nom: '`', shift: '~', finger: 'l-pinky' },
@@ -15,41 +100,41 @@ export const BIJOY_MAPPING: Record<string, { nom: string; shift: string; finger:
   '=': { nom: '=', shift: '+', finger: 'r-pinky' },
   
   // QWERTY Row
-  'q': { nom: 'ঙ', shift: 'ঁ', finger: 'l-pinky' }, // ঙ=q, ঁ=Shift+Q
-  'w': { nom: 'য', shift: 'ব়', finger: 'l-ring' }, // য=w, ব়=Shift+W
-  'e': { nom: 'ড', shift: 'ঢ', finger: 'l-middle' }, // ড=e, ঢ=Shift+E
-  'r': { nom: 'প', shift: 'ফ', finger: 'l-index' }, // প=r, ফ=Shift+R
-  't': { nom: 'ট', shift: 'ঠ', finger: 'l-index' }, // ট=t, ঠ=Shift+T
-  'y': { nom: 'চ', shift: 'ছ', finger: 'r-index' }, // চ=y, ছ=Shift+Y
-  'u': { nom: 'জ', shift: 'ঝ', finger: 'r-index' }, // জ=u, ঝ=Shift+U
-  'i': { nom: 'হ', shift: 'ঞ', finger: 'r-middle' }, // হ=i, ঞ=Shift+I
-  'o': { nom: 'গ', shift: 'ঘ', finger: 'r-ring' }, // গ=o, ঘ=Shift+O
-  'p': { nom: 'ড়', shift: 'ঢ়', finger: 'r-pinky' }, // ড়=p, ঢ়=Shift+P
+  'q': { nom: 'ঙ', shift: '', finger: 'l-pinky' },
+  'w': { nom: 'য', shift: '', finger: 'l-ring' },
+  'e': { nom: 'ড', shift: 'ঢ', finger: 'l-middle' },
+  'r': { nom: 'প', shift: 'ফ', finger: 'l-index' },
+  't': { nom: 'ট', shift: 'ঠ', finger: 'l-index' },
+  'y': { nom: 'চ', shift: 'ছ', finger: 'r-index' },
+  'u': { nom: 'জ', shift: 'ঝ', finger: 'r-index' },
+  'i': { nom: 'হ', shift: 'ঞ', finger: 'r-middle' },
+  'o': { nom: 'গ', shift: 'ঘ', finger: 'r-ring' },
+  'p': { nom: 'ড়', shift: 'ঢ়', finger: 'r-pinky' },
   '[': { nom: '[', shift: '{', finger: 'r-pinky' },
   ']': { nom: ']', shift: '}', finger: 'r-pinky' },
-  '\\': { nom: 'ৎ', shift: 'ং', finger: 'r-pinky' }, // ৎ=\, ং=Shift+\
+  '\\': { nom: 'ৎ', shift: '|', finger: 'r-pinky' },
 
   // ASDF Row
-  'a': { nom: 'ৃ', shift: 'ঁ', finger: 'l-pinky' }, // ৃ=a, ঁ=Shift+A (from the user's kar list, but q also has ঁ. Let's provide what user said)
-  's': { nom: 'ু', shift: 'ূ', finger: 'l-ring' }, // ু=s, ূ=Shift+S
-  'd': { nom: 'ি', shift: 'ী', finger: 'l-middle' }, // ি=d, ী=Shift+D
-  'f': { nom: 'া', shift: 'অ', finger: 'l-index' }, // া=f, অ=Shift+F
-  'g': { nom: 'ং', shift: 'ঁ', finger: 'l-index' }, // ং=g, ঁ=Shift+G (from kar list)
-  'h': { nom: 'ব', shift: 'ভ', finger: 'r-index' }, // ব=h, ভ=Shift+H
-  'j': { nom: 'ক', shift: 'খ', finger: 'r-index' }, // ক=j, খ=Shift+J
-  'k': { nom: 'ত', shift: 'থ', finger: 'r-middle' }, // ত=k, থ=Shift+K
-  'l': { nom: 'দ', shift: 'ধ', finger: 'r-ring' }, // দ=l, ধ=Shift+L
+  'a': { nom: 'ৃ', shift: 'ঁ', finger: 'l-pinky' },
+  's': { nom: 'ু', shift: 'ূ', finger: 'l-ring' },
+  'd': { nom: 'ি', shift: 'ী', finger: 'l-middle' },
+  'f': { nom: 'া', shift: 'অ', finger: 'l-index' },
+  'g': { nom: 'ং', shift: '', finger: 'l-index' },
+  'h': { nom: 'ব', shift: 'ভ', finger: 'r-index' },
+  'j': { nom: 'ক', shift: 'খ', finger: 'r-index' },
+  'k': { nom: 'ত', shift: 'থ', finger: 'r-middle' },
+  'l': { nom: 'দ', shift: 'ধ', finger: 'r-ring' },
   ';': { nom: ';', shift: ':', finger: 'r-pinky' },
   '\'': { nom: '\'', shift: '"', finger: 'r-pinky' },
 
   // ZXCV Row
-  'z': { nom: '্', shift: 'ঃ', finger: 'l-pinky' }, // ্=z, ঃ=Shift+Z
-  'x': { nom: 'ো', shift: 'ৌ', finger: 'l-ring' }, // ো=x, ৌ=Shift+X (Wait, user said ও=x, ঔ=Shift+x for swarabarno! But also ো=x, ৌ=Shift+X. Since it's a typing test, both are handled by x. The visual keyboard just shows one, let's show ো/ৌ visually as it is more common)
-  'c': { nom: 'ে', shift: 'ৈ', finger: 'l-middle' }, // ে=c, ৈ=Shift+C
-  'v': { nom: 'র', shift: 'ল', finger: 'l-index' }, // র=v, ল=Shift+V
-  'b': { nom: 'ন', shift: 'ণ', finger: 'l-index' }, // ন=b, ণ=Shift+B
-  'n': { nom: 'স', shift: 'ষ', finger: 'r-index' }, // স=n, ষ=Shift+N
-  'm': { nom: 'ম', shift: 'শ', finger: 'r-index' }, // ম=m, শ=Shift+M
+  'z': { nom: '্', shift: 'ঃ', finger: 'l-pinky' },
+  'x': { nom: 'ও/ো', shift: 'ৌ', finger: 'l-ring' },
+  'c': { nom: 'ে', shift: 'ৈ', finger: 'l-middle' },
+  'v': { nom: 'র', shift: 'ল', finger: 'l-index' },
+  'b': { nom: 'ন', shift: 'ণ', finger: 'l-index' },
+  'n': { nom: 'স', shift: 'ষ', finger: 'r-index' },
+  'm': { nom: 'ম', shift: 'শ', finger: 'r-index' },
   ',': { nom: ',', shift: '<', finger: 'r-middle' },
   '.': { nom: '.', shift: '>', finger: 'r-ring' },
   '/': { nom: '/', shift: '?', finger: 'r-pinky' },

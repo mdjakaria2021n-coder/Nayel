@@ -8,17 +8,35 @@ interface VirtualKeyboardProps {
 }
 
 export default function VirtualKeyboard({ expectedKey, pressedKey, onKeyClick }: VirtualKeyboardProps) {
-  const shiftMap: Record<string, string> = {
-    '~': '`', '!': '1', '@': '2', '#': '3', '$': '4', '%': '5', '^': '6', '&': '7', '*': '8', '(': '9', ')': '0',
-    '_': '-', '+': '=', '{': '[', '}': ']', '|': '\\', ':': ';', '"': "'", '<': ',', '>': '.', '?': '/'
-  };
+  let isShiftRequired = false;
+  let targetBaseKey: string | null = null;
+  
+  if (expectedKey) {
+    if (expectedKey.startsWith('Shift+')) {
+      isShiftRequired = true;
+      targetBaseKey = expectedKey.replace('Shift+', '').toLowerCase();
+    } else if (expectedKey === 'Space') {
+      targetBaseKey = 'space';
+    } else {
+      targetBaseKey = expectedKey.toLowerCase();
+    }
+  }
 
-  const isAlphaShift = expectedKey && expectedKey === expectedKey.toUpperCase() && expectedKey.toLowerCase() !== expectedKey;
-  const isSymbolShift = expectedKey && !!shiftMap[expectedKey];
-  const isShiftRequired = isAlphaShift || isSymbolShift;
-  
-  const targetBaseKey = expectedKey ? (shiftMap[expectedKey] || expectedKey.toLowerCase()) : null;
-  
+  let pressedBaseKey: string | null = null;
+  let isPressedShift = false;
+  if (pressedKey) {
+    if (pressedKey.startsWith('Shift+')) {
+      isPressedShift = true;
+      pressedBaseKey = pressedKey.replace('Shift+', '').toLowerCase();
+    } else if (pressedKey === 'Space') {
+      pressedBaseKey = 'space';
+    } else if (pressedKey.startsWith('Shift_')) {
+      isPressedShift = true;
+    } else {
+      pressedBaseKey = pressedKey.toLowerCase();
+    }
+  }
+
   return (
     <div className="w-full overflow-x-auto pb-4 hide-scrollbar">
       <div className="flex flex-col gap-[8px] p-[12px] bg-[#e2e8f0] rounded-[12px] select-none font-sans mt-8 mx-auto w-fit min-w-[800px]">
@@ -28,14 +46,13 @@ export default function VirtualKeyboard({ expectedKey, pressedKey, onKeyClick }:
             const isSpecial = ['Backspace', 'Tab', 'Caps', 'Shift_L', 'Shift_R', 'Enter', 'Space'].includes(keyId);
             const mapping = BIJOY_MAPPING[keyId];
             
-            const isTargetSpace = expectedKey === ' ' && keyId === 'Space';
             const isTarget = (!isSpecial && targetBaseKey === keyId.toLowerCase()) || 
-                             (isSpecial && keyId === expectedKey) || 
-                             isTargetSpace ||
+                             (keyId === 'Space' && targetBaseKey === 'space') ||
                              (isShiftRequired && (keyId === 'Shift_L' || keyId === 'Shift_R'));
                              
-            const isPressedSpace = pressedKey === ' ' && keyId === 'Space';
-            const isPressed = (pressedKey?.toLowerCase() === keyId.toLowerCase()) || isPressedSpace;
+            const isPressed = (!isSpecial && pressedBaseKey === keyId.toLowerCase()) || 
+                              (keyId === 'Space' && pressedBaseKey === 'space') ||
+                              (isPressedShift && (keyId === 'Shift_L' || keyId === 'Shift_R'));
 
             let widthClass = 'w-[48px]';
             if (keyId === 'Backspace') widthClass = 'w-[90px]';
