@@ -216,10 +216,6 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
         return next;
       });
       
-      if (typedChar === 'Space') {
-        setInputValue('');
-      }
-
       if (currentIndex + 1 >= expectedKeysSequence.length) {
         finishLesson();
       } else {

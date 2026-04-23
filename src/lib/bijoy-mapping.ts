@@ -55,7 +55,6 @@ export const BIJOY_MAP: Record<string, string[]> = {
   'ভ': ['Shift+H'],
   'ম': ['M'],
   'য': ['Shift+W'],
-  'য়': ['W'],
   'র': ['V'],
   'ল': ['Shift+V'],
   'শ': ['Shift+M'],
