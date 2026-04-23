@@ -328,28 +328,34 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
              </div>
              
              {/* Paragraph Context View */}
-             <div className="w-full max-w-4xl px-2 mb-4 flex flex-wrap justify-center gap-x-1.5 sm:gap-x-2 gap-y-1 sm:gap-y-2 text-base sm:text-xl font-serif leading-relaxed h-[50px] sm:h-[60px] overflow-hidden">
+             <div className="w-full max-w-4xl px-2 mb-2 sm:mb-4 flex flex-wrap justify-center gap-x-1 sm:gap-x-2 gap-y-1 sm:gap-y-2 text-base sm:text-xl font-serif leading-relaxed max-h-[100px] sm:max-h-[120px] overflow-hidden items-end">
                 {(() => {
-                   const windowStart = Math.max(0, activeWordIndex - 8);
-                   const windowEnd = Math.min(lesson.words.length, windowStart + 20);
+                   // Show few words before and after
+                   const windowStart = Math.max(0, activeWordIndex - 6);
+                   const windowEnd = Math.min(lesson.words.length, activeWordIndex + 8);
                    const words = lesson.words.slice(windowStart, windowEnd);
                    return (
                      <>
-                        {windowStart > 0 && <span className="text-slate-400">...</span>}
+                        {windowStart > 0 && <span className="text-slate-400 py-1">...</span>}
                         {words.map((w, localIdx) => {
                            const actualIdx = windowStart + localIdx;
+                           const isCurrent = actualIdx === activeWordIndex;
                            return (
                              <span key={actualIdx} className={cn(
-                               "transition-all duration-200",
+                               "transition-all duration-200 px-2 py-0.5 rounded-md flex items-center gap-1",
                                actualIdx < activeWordIndex ? "text-emerald-500/60 dark:text-emerald-500/50" :
-                               actualIdx === activeWordIndex ? "text-blue-700 dark:text-blue-300 font-bold bg-blue-100 dark:bg-blue-900/40 px-2 py-0.5 rounded-md shadow-sm transform scale-110" :
+                               isCurrent ? "text-blue-700 dark:text-blue-300 font-bold bg-blue-100 dark:bg-blue-900/40 shadow-sm transform scale-110" :
                                "text-slate-600 dark:text-slate-400"
                              )}>
-                               {w.bangla}
+                               <span>{w.bangla}</span>
+                               <span className={cn(
+                                 "w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition-opacity",
+                                 (isCurrent && isTypingSpace) ? "bg-blue-500 animate-pulse opacity-100" : "opacity-0 invisible"
+                               )} />
                              </span>
                            );
                         })}
-                        {windowEnd < lesson.words.length && <span className="text-slate-400">...</span>}
+                        {windowEnd < lesson.words.length && <span className="text-slate-400 py-1">...</span>}
                      </>
                    );
                 })()}
