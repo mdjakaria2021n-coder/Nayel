@@ -37,7 +37,13 @@ const drill = (wordsList: string[], repeats: number = 3): LessonWord[] => {
 };
 
 const plainPara = (sentences: string[]): LessonWord[] => {
-  return sentences.map(s => ({ keys: gKey(s), bangla: s }));
+  const result: LessonWord[] = [];
+  sentences.forEach(s => {
+    // split by space and filter empty
+    const words = s.split(' ').filter(Boolean);
+    words.forEach(w => result.push({ keys: gKey(w), bangla: w }));
+  });
+  return result;
 };
 
 export const LESSONS: Lesson[] = [

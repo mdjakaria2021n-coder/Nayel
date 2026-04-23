@@ -318,17 +318,46 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
 
       {!isFinished ? (
         <>
-          {/* Middle 30% - Character View */}
-          <div className="h-[30dvh] flex flex-col items-center justify-center bg-transparent shrink-0 relative px-4 text-center">
-             <div className="text-sm font-bold text-slate-500 mb-2 font-sans tracking-widest uppercase">{groupTotal > 1 ? `${groupIndex} / ${groupTotal}` : 'Let\'s Start'}</div>
-             <div className={cn("mb-4 drop-shadow-sm transition-all duration-200 font-serif", "text-7xl sm:text-9xl text-slate-800 dark:text-slate-100")}>
+          {/* Middle 35% - Character View */}
+          <div className="h-[35dvh] flex flex-col items-center justify-center bg-transparent shrink-0 relative px-4 text-center">
+             <div className="text-sm font-bold text-slate-500 mb-1 sm:mb-2 font-sans tracking-widest uppercase">{groupTotal > 1 ? `${groupIndex} / ${groupTotal}` : 'Let\'s Start'}</div>
+             <div className={cn("mb-2 sm:mb-4 drop-shadow-sm transition-all duration-200 font-serif", "text-6xl sm:text-8xl text-slate-800 dark:text-slate-100")}>
                  {isTypingSpace ? (
                    <span className="text-slate-300 dark:text-slate-700 italic text-5xl sm:text-7xl">(Space)</span>
                  ) : currentWord?.bangla}
              </div>
+             
+             {/* Paragraph Context View */}
+             <div className="w-full max-w-4xl px-2 mb-4 flex flex-wrap justify-center gap-x-1.5 sm:gap-x-2 gap-y-1 sm:gap-y-2 text-base sm:text-xl font-serif leading-relaxed h-[50px] sm:h-[60px] overflow-hidden">
+                {(() => {
+                   const windowStart = Math.max(0, activeWordIndex - 8);
+                   const windowEnd = Math.min(lesson.words.length, windowStart + 20);
+                   const words = lesson.words.slice(windowStart, windowEnd);
+                   return (
+                     <>
+                        {windowStart > 0 && <span className="text-slate-400">...</span>}
+                        {words.map((w, localIdx) => {
+                           const actualIdx = windowStart + localIdx;
+                           return (
+                             <span key={actualIdx} className={cn(
+                               "transition-all duration-200",
+                               actualIdx < activeWordIndex ? "text-emerald-500/60 dark:text-emerald-500/50" :
+                               actualIdx === activeWordIndex ? "text-blue-700 dark:text-blue-300 font-bold bg-blue-100 dark:bg-blue-900/40 px-2 py-0.5 rounded-md shadow-sm transform scale-110" :
+                               "text-slate-600 dark:text-slate-400"
+                             )}>
+                               {w.bangla}
+                             </span>
+                           );
+                        })}
+                        {windowEnd < lesson.words.length && <span className="text-slate-400">...</span>}
+                     </>
+                   );
+                })()}
+             </div>
+
              {/* Hint Area */}
-             <div className="flex flex-col items-center min-h-[60px]">
-                 <div className="flex flex-wrap justify-center items-center gap-1 sm:gap-2 text-xl sm:text-2xl font-mono px-6 py-2 rounded-xl bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shadow-sm transition-all duration-300 min-w-[200px] text-center font-bold tracking-widest">
+             <div className="flex flex-col items-center min-h-[50px] sm:min-h-[60px]">
+                 <div className="flex flex-wrap justify-center items-center gap-1 sm:gap-2 text-lg sm:text-xl font-mono px-4 sm:px-6 py-1.5 sm:py-2 rounded-xl bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shadow-sm transition-all duration-300 min-w-[150px] sm:min-w-[200px] text-center font-bold tracking-widest">
                     {isTypingSpace ? "Space bar" : (
                        currentWord?.bangla ? getWordKeysArray(currentWord.bangla).filter(k => k !== 'Space').map((char, i) => (
                          <React.Fragment key={i}>
@@ -339,15 +368,15 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
                     )}
                  </div>
                  {(fails >= 1) && (
-                    <div className={cn("mt-2 text-xs sm:text-sm font-sans px-3 py-1 rounded-full transition-colors font-bold", fails >= 3 ? "text-red-700 bg-red-100 dark:bg-red-900/40 dark:text-red-300 animate-pulse" : "text-amber-700 bg-amber-100 dark:bg-amber-900/40 dark:text-amber-300")}>
+                    <div className={cn("mt-2 text-xs font-sans px-3 py-1 rounded-full transition-colors font-bold", fails >= 3 ? "text-red-700 bg-red-100 dark:bg-red-900/40 dark:text-red-300 animate-pulse" : "text-amber-700 bg-amber-100 dark:bg-amber-900/40 dark:text-amber-300")}>
                        {fails >= 3 ? "সঠিক কম্বিনেশন ব্যবহার করুন" : fails >= 2 ? "কীবোর্ডে হাইলাইট করা আছে" : "ভুল হয়েছে, আবার চেষ্টা করুন"}
                     </div>
                  )}
              </div>
           </div>
 
-          {/* Typing Box 15% */}
-          <div className="h-[15dvh] flex items-center justify-center p-2 sm:p-4 bg-transparent shrink-0">
+          {/* Typing Box 10% */}
+          <div className="h-[10dvh] flex items-center justify-center p-2 sm:p-4 bg-transparent shrink-0">
              <div className="relative w-full max-w-sm">
                <input 
                   id="typingInput"
