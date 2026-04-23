@@ -40,8 +40,6 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
   const [pressedKey, setPressedKey] = useState<string | null>(null);
   const [isFinished, setIsFinished] = useState(false);
   const [stats, setStats] = useState({ wpm: 0, accuracy: 100, cpm: 0 });
-
-  const [inputValue, setInputValue] = useState('');
   const [charFails, setCharFails] = useState<Record<number, number>>({});
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -116,7 +114,7 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
 
   useEffect(() => {
     const handleGlobalClick = () => {
-      document.getElementById('typingInput')?.focus();
+      document.getElementById('typingInput')?.focus({ preventScroll: true });
     };
     document.addEventListener('click', handleGlobalClick);
     return () => document.removeEventListener('click', handleGlobalClick);
@@ -158,12 +156,6 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
       
       const correctCharsInCurrentWord = currentIndex - activeAccumulator;
       
-      // If there are extra wrong characters in the input, just let native backspace remove them without going back in the global sequence
-      if (inputValue.length > correctCharsInCurrentWord) {
-         // Do nothing to engine state, let native input remove character via onChange
-         return;
-      }
-
       if (currentIndex > 0 && expectedKeysSequence[currentIndex - 1] !== 'Space') {
         setCurrentIndex(prev => prev - 1);
         setTypedInputs(prev => {
@@ -254,7 +246,6 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
     setIsFinished(false);
     setStats({ wpm: 0, accuracy: 100, cpm: 0 });
     setCountdown(null);
-    setInputValue('');
     setCharFails({});
     inputRef.current?.focus();
   };
@@ -357,19 +348,78 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
 
           {/* Typing Box 15% */}
           <div className="h-[15dvh] flex items-center justify-center p-2 sm:p-4 bg-transparent shrink-0">
-             <input 
-                id="typingInput"
-                ref={inputRef}
-                type="text" 
-                autoFocus
-                value={inputValue}
-                onChange={(e) => {
-                  setInputValue(e.target.value);
-                }}
-                onKeyDown={handleKeyDown}
-                className="w-full max-w-sm text-center text-3xl sm:text-4xl font-serif py-3 sm:py-4 rounded-xl border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 shadow-inner"
-                placeholder="টাইপ করুন..."
-              />
+             <div className="relative w-full max-w-sm">
+               <input 
+                  id="typingInput"
+                  ref={inputRef}
+                  type="text" 
+                  autoFocus
+                  readOnly
+                  value=""
+                  onKeyDown={handleKeyDown}
+                  className="absolute inset-0 w-full text-center text-3xl sm:text-4xl font-serif py-3 sm:py-4 rounded-xl border border-transparent bg-transparent outline-none text-transparent z-10 cursor-default"
+                  placeholder=""
+                />
+                <div className="w-full text-center text-3xl sm:text-4xl font-mono py-3 sm:py-4 rounded-xl border border-slate-300 dark:border-slate-600 outline-none bg-white dark:bg-slate-800 shadow-inner flex items-center justify-center gap-2 overflow-hidden h-[60px] sm:h-[76px] transition-colors"
+                  style={{
+                    backgroundColor: typedInputs[currentIndex - 1] === 'wrong' ? 'rgb(254 226 226)' : undefined // red-100 fallback for flash
+                  }}
+                >
+                  {expectedKeysSequence.slice(
+                     (() => {
+                       let activeAccumulator = 0;
+                       for (let i = 0; i < lesson.words.length; i++) {
+                         const wordKeyCount = getWordKeysArray(lesson.words[i].bangla).filter(k => k !== 'Space').length;
+                         if (currentIndex >= activeAccumulator && currentIndex < activeAccumulator + wordKeyCount + 1) {
+                           break;
+                         }
+                         activeAccumulator += wordKeyCount + 1;
+                       }
+                       return activeAccumulator;
+                     })(),
+                     (() => {
+                        let activeAccumulator = 0;
+                        for (let i = 0; i < lesson.words.length; i++) {
+                          const wordKeyCount = getWordKeysArray(lesson.words[i].bangla).filter(k => k !== 'Space').length;
+                          if (currentIndex >= activeAccumulator && currentIndex < activeAccumulator + wordKeyCount + 1) {
+                            return activeAccumulator + wordKeyCount;
+                          }
+                          activeAccumulator += wordKeyCount + 1;
+                        }
+                        return activeAccumulator;
+                     })()
+                  ).map((keyStr, localIdx) => {
+                     const globalIdx = (() => {
+                       let activeAccumulator = 0;
+                       for (let i = 0; i < lesson.words.length; i++) {
+                         const wordKeyCount = getWordKeysArray(lesson.words[i].bangla).filter(k => k !== 'Space').length;
+                         if (currentIndex >= activeAccumulator && currentIndex < activeAccumulator + wordKeyCount + 1) {
+                           break;
+                         }
+                         activeAccumulator += wordKeyCount + 1;
+                       }
+                       return activeAccumulator;
+                     })() + localIdx;
+
+                     const status = typedInputs[globalIdx];
+                     const isCurrent = globalIdx === currentIndex;
+
+                     return (
+                        <div key={globalIdx} className={cn(
+                          "w-4 h-4 sm:w-5 sm:h-5 rounded-full transition-all duration-200",
+                          status === 'correct' ? "bg-emerald-500 scale-100" :
+                          status === 'wrong' ? "bg-red-500 scale-100" :
+                          isCurrent ? "bg-blue-400 scale-125 animate-pulse" :
+                          "bg-slate-200 dark:bg-slate-700 scale-75"
+                        )} />
+                     );
+                  })}
+                  
+                  {isTypingSpace && (
+                      <div className="w-16 h-2 rounded-full bg-blue-400 scale-125 animate-pulse ml-2" />
+                  )}
+                </div>
+             </div>
           </div>
 
           {/* Keyboard 35% */}

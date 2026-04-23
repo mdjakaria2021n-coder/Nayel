@@ -21,8 +21,8 @@ export const BIJOY_MAP: Record<string, string[]> = {
   'ৃ': ['A'],
   'ে': ['C'],
   'ৈ': ['Shift+C'],
-  'ো': ['X'],
-  'ৌ': ['Shift+X'],
+  'ো': ['F', 'C'],
+  'ৌ': ['F', 'Shift+C'],
   'ঁ': ['Shift+A'],
   'ং': ['G'],
   'ঃ': ['Shift+Z'],
@@ -55,18 +55,22 @@ export const BIJOY_MAP: Record<string, string[]> = {
   'ভ': ['Shift+H'],
   'ম': ['M'],
   'য': ['Shift+W'],
+  'য়': ['W'],
   'র': ['V'],
   'ল': ['Shift+V'],
   'শ': ['Shift+M'],
   'ষ': ['Shift+N'],
   'স': ['N'],
   'হ': ['I'],
+
+  // Unicode variants
   'ড়': ['P'], // U+09DC
   'ড়': ['P'], // U+09A1 U+09BC (fallback)
   'ঢ়': ['Shift+P'], // U+09DD
   'ঢ়': ['Shift+P'], // U+09A2 U+09BC (fallback)
   'য়': ['W'], // U+09DF
   'য়': ['W'], // U+09AF U+09BC (fallback)
+  
   'ৎ': ['\\'],
 };
 
