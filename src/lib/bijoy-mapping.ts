@@ -54,7 +54,7 @@ export const BIJOY_MAP: Record<string, string[]> = {
   'ব': ['H'],
   'ভ': ['Shift+H'],
   'ম': ['M'],
-  'য': ['Shift+W'],
+  'য': ['W'],
   'র': ['V'],
   'ল': ['Shift+V'],
   'শ': ['Shift+M'],
@@ -67,15 +67,23 @@ export const BIJOY_MAP: Record<string, string[]> = {
   'ড়': ['P'], // U+09A1 U+09BC (fallback)
   'ঢ়': ['Shift+P'], // U+09DD
   'ঢ়': ['Shift+P'], // U+09A2 U+09BC (fallback)
-  'য়': ['W'], // U+09DF
-  'য়': ['W'], // U+09AF U+09BC (fallback)
+  'য়': ['Shift+W'], // U+09DF
+  'য়': ['Shift+W'], // U+09AF U+09BC (fallback)
   
   'ৎ': ['\\'],
+  '।': ['Shift+G'],
 };
 
 export function getWordKeysArray(word: string): string[] {
   const result: string[] = [];
-  for (const char of [...word]) {
+  
+  // Normalize compound characters before splitting
+  const normalizedWord = word
+    .replace(/\u09A1\u09BC/g, '\u09DC') // ড়/ড়
+    .replace(/\u09A2\u09BC/g, '\u09DD') // ঢ়/ঢ়
+    .replace(/\u09AF\u09BC/g, '\u09DF'); // য়/য়
+
+  for (const char of [...normalizedWord]) {
     if (BIJOY_MAP[char]) {
       result.push(...BIJOY_MAP[char]);
     } else {
@@ -107,7 +115,7 @@ export const BIJOY_MAPPING: Record<string, { nom: string; shift: string; finger:
   
   // QWERTY Row
   'q': { nom: 'ঙ', shift: '', finger: 'l-pinky' },
-  'w': { nom: 'য়', shift: 'য', finger: 'l-ring' },
+  'w': { nom: 'য', shift: 'য়', finger: 'l-ring' },
   'e': { nom: 'ড', shift: 'ঢ', finger: 'l-middle' },
   'r': { nom: 'প', shift: 'ফ', finger: 'l-index' },
   't': { nom: 'ট', shift: 'ঠ', finger: 'l-index' },
@@ -125,7 +133,7 @@ export const BIJOY_MAPPING: Record<string, { nom: string; shift: string; finger:
   's': { nom: 'ু', shift: 'ূ', finger: 'l-ring' },
   'd': { nom: 'ি', shift: 'ী', finger: 'l-middle' },
   'f': { nom: 'া', shift: 'অ', finger: 'l-index' },
-  'g': { nom: 'ং', shift: '', finger: 'l-index' },
+  'g': { nom: 'ং', shift: '।', finger: 'l-index' },
   'h': { nom: 'ব', shift: 'ভ', finger: 'r-index' },
   'j': { nom: 'ক', shift: 'খ', finger: 'r-index' },
   'k': { nom: 'ত', shift: 'থ', finger: 'r-middle' },
