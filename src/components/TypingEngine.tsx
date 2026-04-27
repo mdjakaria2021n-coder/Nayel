@@ -21,18 +21,23 @@ export interface TypingEngineProps {
 }
 
 export default function TypingEngine({ lesson, mode = 'practice', soundEnabled = true, onComplete, onNextLesson, onBack }: TypingEngineProps) {
-  const expectedKeysSequence = lesson.words.flatMap((word, i) => {
-    let keys = getWordKeysArray(word.bangla);
-    // filter out any unexpected spaces inside word
-    keys = keys.filter(k => k !== 'Space');
-    if (i < lesson.words.length - 1) {
-      return [...keys, 'Space'];
-    }
-    return keys;
-  });
+  const [currentWords, setCurrentWords] = useState<Lesson['words']>(lesson.words);
+  const [addedForReview, setAddedForReview] = useState<Set<string>>(new Set());
+
+  const expectedKeysSequence = React.useMemo(() => {
+    return currentWords.flatMap((word, i) => {
+      let keys = getWordKeysArray(word.bangla);
+      // filter out any unexpected spaces inside word
+      keys = keys.filter(k => k !== 'Space');
+      if (i < currentWords.length - 1) {
+        return [...keys, 'Space'];
+      }
+      return keys;
+    });
+  }, [currentWords]);
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [typedInputs, setTypedInputs] = useState<('correct' | 'wrong' | null)[]>(new Array(expectedKeysSequence.length).fill(null));
+  const [typedInputs, setTypedInputs] = useState<('correct' | 'wrong' | null)[]>([]);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [currentTime, setCurrentTime] = useState<number>(0); // Keeps track of passing seconds
   const [errors, setErrors] = useState(0);
@@ -58,8 +63,8 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
     // Count exact correct words completed
     let correctWords = 0;
     let countedChars = 0;
-    for (let i = 0; i < lesson.words.length; i++) {
-        const wordLen = lesson.words[i].keys.length;
+    for (let i = 0; i < currentWords.length; i++) {
+        const wordLen = currentWords[i].keys.length;
         if (currentIndex >= countedChars + wordLen) {
             correctWords++;
         }
@@ -154,8 +159,8 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
     if (e.key === 'Backspace') {
       // Find the start index of the current word
       let activeAccumulator = 0;
-      for (let i = 0; i < lesson.words.length; i++) {
-        const wordKeyCount = getWordKeysArray(lesson.words[i].bangla).filter(k => k !== 'Space').length;
+      for (let i = 0; i < currentWords.length; i++) {
+        const wordKeyCount = getWordKeysArray(currentWords[i].bangla).filter(k => k !== 'Space').length;
         if (currentIndex >= activeAccumulator && currentIndex < activeAccumulator + wordKeyCount + 1) {
           break;
         }
@@ -231,6 +236,23 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
       setErrors(prev => prev + 1);
       setErrorKeys(prev => ({ ...prev, [expectedChar]: (prev[expectedChar] || 0) + 1 }));
       setCharFails(prev => ({ ...prev, [currentIndex]: (prev[currentIndex] || 0) + 1 }));
+
+      let accumulatedKeys = 0;
+      let activeWordIdx = 0;
+      for (let i = 0; i < currentWords.length; i++) {
+        const wordKeyCount = getWordKeysArray(currentWords[i].bangla).filter(k => k !== 'Space').length;
+        if (currentIndex >= accumulatedKeys && currentIndex < accumulatedKeys + wordKeyCount + 1) {
+          activeWordIdx = i;
+          break;
+        }
+        accumulatedKeys += wordKeyCount + 1;
+      }
+      
+      const mistakenWord = currentWords[activeWordIdx];
+      if (mistakenWord && !addedForReview.has(mistakenWord.bangla)) {
+         setAddedForReview(prev => new Set(prev).add(mistakenWord.bangla));
+         setCurrentWords(prev => [...prev, Object.assign({}, mistakenWord)]);
+      }
     }
     
     setTimeout(() => setPressedKey(null), 100);
@@ -241,8 +263,10 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
   };
 
   const reset = () => {
+    setCurrentWords(lesson.words);
+    setAddedForReview(new Set());
     setCurrentIndex(0);
-    setTypedInputs(new Array(expectedKeysSequence.length).fill(null));
+    setTypedInputs([]);
     setStartTime(null);
     setCurrentTime(0);
     setErrors(0);
@@ -254,10 +278,14 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
     inputRef.current?.focus();
   };
 
+  useEffect(() => {
+    reset();
+  }, [lesson]);
+
   let accumulatedKeys = 0;
   let activeWordIndex = 0;
-  for (let i = 0; i < lesson.words.length; i++) {
-    const wordKeyCount = getWordKeysArray(lesson.words[i].bangla).filter(k => k !== 'Space').length;
+  for (let i = 0; i < currentWords.length; i++) {
+    const wordKeyCount = getWordKeysArray(currentWords[i].bangla).filter(k => k !== 'Space').length;
     // adding 1 representing the space expected after a word
     if (currentIndex >= accumulatedKeys && currentIndex < accumulatedKeys + wordKeyCount + 1) {
       activeWordIndex = i;
@@ -274,11 +302,11 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
   const wpmColor = stats.wpm === 0 ? "" : stats.wpm < 10 ? "text-red-500 dark:text-red-400" : stats.wpm <= 20 ? "text-amber-500 dark:text-amber-400" : "text-green-500 dark:text-green-400";
 
   // Track groups for 7/10 text 
-  const currentWord = lesson.words[activeWordIndex];
+  const currentWord = currentWords[activeWordIndex];
   let start = activeWordIndex;
-  while (start > 0 && lesson.words[start - 1]?.bangla === currentWord?.bangla) start--;
+  while (start > 0 && currentWords[start - 1]?.bangla === currentWord?.bangla) start--;
   let end = activeWordIndex;
-  while (end < lesson.words.length - 1 && lesson.words[end + 1]?.bangla === currentWord?.bangla) end++;
+  while (end < currentWords.length - 1 && currentWords[end + 1]?.bangla === currentWord?.bangla) end++;
 
   const groupTotal = end - start + 1;
   const groupIndex = activeWordIndex - start + 1;
@@ -336,8 +364,8 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
                 {(() => {
                    // Show few words before and after
                    const windowStart = Math.max(0, activeWordIndex - 6);
-                   const windowEnd = Math.min(lesson.words.length, activeWordIndex + 8);
-                   const words = lesson.words.slice(windowStart, windowEnd);
+                   const windowEnd = Math.min(currentWords.length, activeWordIndex + 8);
+                   const words = currentWords.slice(windowStart, windowEnd);
                    return (
                      <>
                         {windowStart > 0 && <span className="text-slate-400 py-1">...</span>}
@@ -359,7 +387,7 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
                              </span>
                            );
                         })}
-                        {windowEnd < lesson.words.length && <span className="text-slate-400 py-1">...</span>}
+                        {windowEnd < currentWords.length && <span className="text-slate-400 py-1">...</span>}
                      </>
                    );
                 })()}
@@ -407,8 +435,8 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
                   {expectedKeysSequence.slice(
                      (() => {
                        let activeAccumulator = 0;
-                       for (let i = 0; i < lesson.words.length; i++) {
-                         const wordKeyCount = getWordKeysArray(lesson.words[i].bangla).filter(k => k !== 'Space').length;
+                       for (let i = 0; i < currentWords.length; i++) {
+                         const wordKeyCount = getWordKeysArray(currentWords[i].bangla).filter(k => k !== 'Space').length;
                          if (currentIndex >= activeAccumulator && currentIndex < activeAccumulator + wordKeyCount + 1) {
                            break;
                          }
@@ -418,8 +446,8 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
                      })(),
                      (() => {
                         let activeAccumulator = 0;
-                        for (let i = 0; i < lesson.words.length; i++) {
-                          const wordKeyCount = getWordKeysArray(lesson.words[i].bangla).filter(k => k !== 'Space').length;
+                        for (let i = 0; i < currentWords.length; i++) {
+                          const wordKeyCount = getWordKeysArray(currentWords[i].bangla).filter(k => k !== 'Space').length;
                           if (currentIndex >= activeAccumulator && currentIndex < activeAccumulator + wordKeyCount + 1) {
                             return activeAccumulator + wordKeyCount;
                           }
@@ -430,8 +458,8 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
                   ).map((keyStr, localIdx) => {
                      const globalIdx = (() => {
                        let activeAccumulator = 0;
-                       for (let i = 0; i < lesson.words.length; i++) {
-                         const wordKeyCount = getWordKeysArray(lesson.words[i].bangla).filter(k => k !== 'Space').length;
+                       for (let i = 0; i < currentWords.length; i++) {
+                         const wordKeyCount = getWordKeysArray(currentWords[i].bangla).filter(k => k !== 'Space').length;
                          if (currentIndex >= activeAccumulator && currentIndex < activeAccumulator + wordKeyCount + 1) {
                            break;
                          }
