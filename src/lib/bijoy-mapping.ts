@@ -24,9 +24,9 @@ export const BIJOY_MAP: Record<string, string[]> = {
   'ো': ['F', 'C'],
   'ৌ': ['F', 'Shift+C'],
   'ঁ': ['Shift+A'],
-  'ং': ['G'],
-  'ঃ': ['Shift+Z'],
-  '্': ['Z'],
+  'ং': ['Shift+Q'],
+  'ঃ': ['Shift+\\'],
+  '্': ['G'],
 
   // ব্যঞ্জনবর্ণ
   'ক': ['J'],
@@ -114,7 +114,7 @@ export const BIJOY_MAPPING: Record<string, { nom: string; shift: string; finger:
   '=': { nom: '=', shift: '+', finger: 'r-pinky' },
   
   // QWERTY Row
-  'q': { nom: 'ঙ', shift: '', finger: 'l-pinky' },
+  'q': { nom: 'ঙ', shift: 'ং', finger: 'l-pinky' },
   'w': { nom: 'য', shift: 'য়', finger: 'l-ring' },
   'e': { nom: 'ড', shift: 'ঢ', finger: 'l-middle' },
   'r': { nom: 'প', shift: 'ফ', finger: 'l-index' },
@@ -126,14 +126,14 @@ export const BIJOY_MAPPING: Record<string, { nom: string; shift: string; finger:
   'p': { nom: 'ড়', shift: 'ঢ়', finger: 'r-pinky' },
   '[': { nom: '[', shift: '{', finger: 'r-pinky' },
   ']': { nom: ']', shift: '}', finger: 'r-pinky' },
-  '\\': { nom: 'ৎ', shift: '|', finger: 'r-pinky' },
+  '\\': { nom: 'ৎ', shift: 'ঃ', finger: 'r-pinky' },
 
   // ASDF Row
   'a': { nom: 'ৃ', shift: 'ঁ', finger: 'l-pinky' },
   's': { nom: 'ু', shift: 'ূ', finger: 'l-ring' },
   'd': { nom: 'ি', shift: 'ী', finger: 'l-middle' },
   'f': { nom: 'া', shift: 'অ', finger: 'l-index' },
-  'g': { nom: 'ং', shift: '।', finger: 'l-index' },
+  'g': { nom: '্', shift: '।', finger: 'l-index' },
   'h': { nom: 'ব', shift: 'ভ', finger: 'r-index' },
   'j': { nom: 'ক', shift: 'খ', finger: 'r-index' },
   'k': { nom: 'ত', shift: 'থ', finger: 'r-middle' },
@@ -142,7 +142,7 @@ export const BIJOY_MAPPING: Record<string, { nom: string; shift: string; finger:
   '\'': { nom: '\'', shift: '"', finger: 'r-pinky' },
 
   // ZXCV Row
-  'z': { nom: '্', shift: 'ঃ', finger: 'l-pinky' },
+  'z': { nom: '্র', shift: '্য', finger: 'l-pinky' },
   'x': { nom: 'ও/ো', shift: 'ৌ', finger: 'l-ring' },
   'c': { nom: 'ে', shift: 'ৈ', finger: 'l-middle' },
   'v': { nom: 'র', shift: 'ল', finger: 'l-index' },
