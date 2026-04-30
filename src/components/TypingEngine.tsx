@@ -64,11 +64,11 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
     let correctWords = 0;
     let countedChars = 0;
     for (let i = 0; i < currentWords.length; i++) {
-        const wordLen = currentWords[i].keys.length;
-        if (currentIndex >= countedChars + wordLen) {
+        const wordKeyCount = getWordKeysArray(currentWords[i].bangla).filter(k => k !== 'Space').length;
+        if (currentIndex >= countedChars + wordKeyCount) {
             correctWords++;
         }
-        countedChars += wordLen + 1; // plus space
+        countedChars += wordKeyCount + 1; // plus space
     }
 
     const netWpm = Math.max(0, correctWords / timeMins);
@@ -213,7 +213,15 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
 
     const expectedChar = expectedKeysSequence[currentIndex];
 
-    if (typedChar === expectedChar) {
+    // Case insensitive match for regular characters to support mobile keyboards
+    let isMatch = typedChar === expectedChar;
+    if (!isMatch && expectedChar && !expectedChar.startsWith('Shift+') && expectedChar !== 'Space') {
+      if (typedChar.toLowerCase() === expectedChar.toLowerCase()) {
+        isMatch = true;
+      }
+    }
+
+    if (isMatch) {
       playSound('correct', soundEnabled);
       setTypedInputs(prev => {
         const next = [...prev];
@@ -397,12 +405,19 @@ export default function TypingEngine({ lesson, mode = 'practice', soundEnabled =
              <div className="flex flex-col items-center min-h-[50px] sm:min-h-[60px]">
                  <div className="flex flex-wrap justify-center items-center gap-1 sm:gap-2 text-lg sm:text-xl font-mono px-4 sm:px-6 py-1.5 sm:py-2 rounded-xl bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shadow-sm transition-all duration-300 min-w-[150px] sm:min-w-[200px] text-center font-bold tracking-widest">
                     {isTypingSpace ? "Space চাপুন →" : (
-                       currentWord?.bangla ? getWordKeysArray(currentWord.bangla).filter(k => k !== 'Space').map((char, i) => (
-                         <React.Fragment key={i}>
-                           {i > 0 && <span className="opacity-50 mx-1">→</span>}
-                           <span>{char}</span>
-                         </React.Fragment>
-                       )) : null
+                       currentWord?.bangla ? (
+                         <div className="flex gap-1 items-center">
+                           {getWordKeysArray(currentWord.bangla).filter(k => k !== 'Space').map((char, i) => {
+                             const displayChar = char.startsWith('Shift+') ? char : char.toLowerCase();
+                             return (
+                               <React.Fragment key={i}>
+                                 {i > 0 && <span className="opacity-50 mx-1">+</span>}
+                                 <span>{displayChar}</span>
+                               </React.Fragment>
+                             )
+                           })}
+                         </div>
+                       ) : null
                     )}
                  </div>
                  {(fails >= 1) && (
